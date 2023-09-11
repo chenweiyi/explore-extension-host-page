@@ -21,6 +21,11 @@ const Newtab = () => {
   const [categoryData, setCategoryData] = useState<ICategoryData>(new Map())
   const [folders, setFolders] = useState<Array<ICategoryKey>>([])
 
+  const [filterData, setFilterData] = useState<
+    chrome.bookmarks.BookmarkTreeNode[]
+  >([])
+  const [activeFolder, setActiveFolder] = useState<string>('-1')
+
   const res: chrome.bookmarks.BookmarkTreeNode[] = []
   const mapRes: ICategoryData = new Map()
 
@@ -90,6 +95,12 @@ const Newtab = () => {
     })
   }
 
+  function changeFilterDataByActiveFolder() {
+    const data = categoryData.get(folders.find((f) => f.id === activeFolder))
+    console.log('data:', data)
+    setFilterData(data || [])
+  }
+
   useEffect(() => {
     traverseAllData()
     traverseCategoryData()
@@ -102,6 +113,10 @@ const Newtab = () => {
     }
     setFolders(folders)
   }, [categoryData.size])
+
+  useEffect(() => {
+    changeFilterDataByActiveFolder()
+  }, [activeFolder, categoryData.size, folders.length])
 
   return (
     <div
@@ -130,10 +145,15 @@ const Newtab = () => {
                   bg-gray-300
                   rounded-[2px]
                   text-black
-                  p-[2px]
+                  px-[8px]
+                  py-[2px]
                   mr-[8px]
                   mb-[8px]
+                  cursor-pointer
+                  hover:text-white
+                  hover:bg-green-400
                 '
+                onClick={() => setActiveFolder(folder.id)}
               >
                 {folder.title}
               </span>
@@ -146,10 +166,10 @@ const Newtab = () => {
           app-content 
           flex
           flex-wrap
-          justify-around
+          justify-start
         '
       >
-        {allData.map((d) => {
+        {filterData?.map((d) => {
           return (
             <div
               className='
