@@ -280,7 +280,8 @@ const Newtab = () => {
           py-[12px]
           grid
           grid-cols-4
-          auto-rows-auto
+          grid-rows-[80px]
+          auto-rows-[80px]
           gap-x-[16px]
           gap-y-[16px]
           overflow-y-auto
@@ -290,8 +291,7 @@ const Newtab = () => {
             return (
               <div
                 className='
-                item 
-                min-h-[80px]
+                item
                 border 
                 border-cyan-300
                 px-[8px] 
