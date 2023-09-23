@@ -16,23 +16,18 @@ const manifest: chrome.runtime.ManifestV3 = {
   },
   action: {
     default_popup: 'src/pages/popup/index.html',
-    default_icon: 'tab-icon-48.png',
+    default_icon: {
+      48: 'tab-icon-48.png'
+    },
     default_title: 'my-tab'
   },
   chrome_url_overrides: {
     newtab: 'src/pages/newtab/index.html'
   },
   icons: {
-    '128': 'tab-icon-128.png',
-    '48': 'tab-icon-48.png',
-    '16': 'tab-icon-16.png'
-  },
-  browser_action: {
-    default_icon: {
-      '128': 'tab-icon-128.png',
-      '48': 'tab-icon-48.png',
-      '16': 'tab-icon-16.png'
-    }
+    128: 'tab-icon-128.png',
+    48: 'tab-icon-48.png',
+    16: 'tab-icon-16.png'
   },
   content_scripts: [
     {

@@ -5,6 +5,7 @@ module.exports = {
     node: true
   },
   extends: [
+    './.eslintrc-auto-import.json',
     'eslint:recommended',
     'plugin:react/recommended',
     'plugin:@typescript-eslint/recommended',
@@ -25,7 +26,8 @@ module.exports = {
     }
   },
   rules: {
-    'react/react-in-jsx-scope': 'off'
+    'react/react-in-jsx-scope': 'off',
+    'react/jsx-no-undef': 'off'
   },
   globals: {
     chrome: 'readonly'

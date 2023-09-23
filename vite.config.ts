@@ -6,6 +6,9 @@ import customDynamicImport from './utils/plugins/custom-dynamic-import'
 import addHmr from './utils/plugins/add-hmr'
 import watchRebuild from './utils/plugins/watch-rebuild'
 import manifest from './manifest'
+import Icons from 'unplugin-icons/vite'
+import IconsResolver from 'unplugin-icons/resolver'
+import AutoImport from 'unplugin-auto-import/vite'
 
 const rootDir = resolve(__dirname)
 const srcDir = resolve(rootDir, 'src')
@@ -30,6 +33,22 @@ export default defineConfig({
     }
   },
   plugins: [
+    AutoImport({
+      dts: true,
+      resolvers: [
+        IconsResolver({
+          prefix: 'i',
+          extension: 'jsx'
+        })
+      ],
+      eslintrc: {
+        enabled: true
+      }
+    }),
+    Icons({
+      compiler: 'jsx',
+      jsx: 'react'
+    }),
     react(),
     makeManifest(manifest, {
       isDev,

@@ -1,0 +1,9 @@
+{
+  "globals": {
+    "IMdiLinkVariant": true,
+    "IMdiFolder": true,
+    "IMdiFolderOutline": true,
+    "IMdiMagnify": true,
+    "IMdiAccount": true
+  }
+}
