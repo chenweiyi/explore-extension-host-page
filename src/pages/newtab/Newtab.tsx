@@ -6,46 +6,27 @@ import withSuspense from '@src/shared/hoc/withSuspense'
 import { isNil } from 'lodash-es'
 import clsx from 'clsx'
 import logo from '@assets/img/tab-icon-48.png'
+import dayjs from 'dayjs'
 
 interface ICategoryKey extends chrome.bookmarks.BookmarkTreeNode {
   parentIds?: Set<string>
   parentTitles?: string[]
+  lastModifiedTime?: string
 }
 
-type ICategoryData = Map<ICategoryKey, chrome.bookmarks.BookmarkTreeNode[]>
+type ICategoryData = Map<ICategoryKey, ICategoryKey[]>
 
 const Newtab = () => {
   // const theme = useStorage(exampleThemeStorage)
 
-  const [allData, setAllData] = useState<chrome.bookmarks.BookmarkTreeNode[]>(
-    []
-  )
   const [categoryData, setCategoryData] = useState<ICategoryData>(new Map())
   const [folders, setFolders] = useState<Array<ICategoryKey>>([])
 
-  const [filterData, setFilterData] = useState<
-    chrome.bookmarks.BookmarkTreeNode[]
-  >([])
+  const [filterData, setFilterData] = useState<ICategoryKey[]>([])
   const [activeFolder, setActiveFolder] = useState<string>('-1')
   const [searchVal, setSearchVal] = useState<string>('')
 
-  const res: chrome.bookmarks.BookmarkTreeNode[] = []
   const mapRes: ICategoryData = new Map()
-
-  function processBookmarkNodes(nodes: chrome.bookmarks.BookmarkTreeNode[]) {
-    for (let i = 0; i < nodes.length; i++) {
-      const node = nodes[i]
-      if (node.url) {
-        // 处理书签节点的URL
-        // console.log(node.url)
-        res.push(node)
-      }
-      if (node.children) {
-        // 递归处理子节点
-        processBookmarkNodes(node.children)
-      }
-    }
-  }
 
   function processBookmarkNodes2(
     nodes: ICategoryKey[],
@@ -53,17 +34,28 @@ const Newtab = () => {
   ) {
     for (let i = 0; i < nodes.length; i++) {
       const node = nodes[i]
-      if (isNil(node.url)) {
+      if (isNil(node.url) && node.children?.length > 0) {
         !node.parentIds && (node.parentIds = new Set())
-        node.parentIds.add(node.parentId)
+        !isNil(node.parentId) && node.parentIds.add(node.parentId)
         !node.parentTitles && (node.parentTitles = [])
-        parentNode && node.parentTitles.push(parentNode.title)
-      }
-      if (node.children) {
+        parentNode?.title && node.parentTitles.push(parentNode.title)
         if (node.children.find((node) => node.url)) {
           mapRes.set(
             node,
-            node.children.filter((node) => !node.children && node.url)
+            node.children
+              .filter((node) => !node.children && node.url)
+              .map((node2) => {
+                const _node: ICategoryKey = { ...node2 }
+                !_node.parentIds && (_node.parentIds = new Set())
+                !isNil(_node.parentId) && _node.parentIds.add(_node.parentId)
+                !_node.parentTitles && (_node.parentTitles = [])
+                node?.title && _node.parentTitles.push(node.title)
+                _node.lastModifiedTime = dayjs(_node.dateAdded).format(
+                  'YYYY-MM-DD'
+                )
+                return _node
+              })
+              .sort((a, b) => b.dateAdded - a.dateAdded)
           )
         }
         // 递归处理子节点
@@ -72,29 +64,24 @@ const Newtab = () => {
     }
   }
 
-  function traverseAllData() {
-    chrome.bookmarks.getTree(function (bookmarkTreeNodes) {
-      console.log(bookmarkTreeNodes)
-      processBookmarkNodes(bookmarkTreeNodes)
-      setAllData(res)
-    })
-  }
-
   function traverseCategoryData() {
     chrome.bookmarks.getTree(function (bookmarkTreeNodes) {
+      console.log('bookmarkTreeNodes:', bookmarkTreeNodes)
       processBookmarkNodes2(bookmarkTreeNodes)
-      const newMapRes: ICategoryData = new Map()
-      newMapRes.set(
-        {
-          id: '-1',
-          title: '全部'
-        },
-        res
-      )
-      for (const [key, val] of mapRes) {
-        newMapRes.set(key, val)
+      const allKey = {
+        id: '-1',
+        title: '全部'
       }
-      setCategoryData(newMapRes)
+      const arr: ICategoryKey[] = []
+      for (const val of mapRes.values()) {
+        arr.push(...val)
+      }
+      mapRes.set(
+        allKey,
+        arr.sort((a, b) => b.dateAdded - a.dateAdded)
+      )
+      console.log('mapRes:', mapRes)
+      setCategoryData(mapRes)
     })
   }
 
@@ -119,23 +106,24 @@ const Newtab = () => {
   }
 
   useEffect(() => {
-    traverseAllData()
     traverseCategoryData()
   }, [])
 
   useEffect(() => {
-    const folders = []
+    const folders: ICategoryKey[] = []
     for (const key of categoryData.keys()) {
       folders.push(key)
     }
-    setFolders(folders)
+    const allKeyIndex = folders.findIndex((f) => f.id === '-1')
+    const allKey = folders.splice(allKeyIndex, 1)
+    setFolders([...allKey, ...folders])
   }, [categoryData.size])
 
   useEffect(() => {
     changeFilterDataByActiveFolder()
   }, [activeFolder, categoryData.size, folders.length, searchVal])
 
-  // console.log('activeFolder:', activeFolder)
+  console.log('folders:', folders)
 
   return (
     <div
@@ -274,33 +262,33 @@ const Newtab = () => {
         </div>
         <div
           className='
-          app-content
-          flex-1
-          px-[16px]
-          py-[12px]
-          grid
-          grid-cols-4
-          grid-rows-[80px]
-          auto-rows-[80px]
-          gap-x-[16px]
-          gap-y-[16px]
-          overflow-y-auto
-        '
+            app-content
+            flex-1
+            px-[16px]
+            py-[12px]
+            grid
+            grid-cols-3
+            grid-rows-[128px]
+            auto-rows-[128px]
+            gap-x-[16px]
+            gap-y-[16px]
+            overflow-y-auto
+          '
         >
           {filterData?.map((d) => {
             return (
               <div
                 className='
                 item
+                flex
+                flex-col
+                items-stretch
                 border 
                 border-cyan-300
                 px-[8px] 
                 py-[12px] 
                 rounded-[4px] 
                 bg-cyan-200
-                overflow-hidden 
-                text-ellipsis 
-                whitespace-nowrap
                 text-black
                 font-medium
                 cursor-pointer
@@ -311,37 +299,101 @@ const Newtab = () => {
                 group
               '
                 key={d.id}
-                title={d.title}
                 onClick={() => window.open(d.url)}
               >
-                <a
-                  href={d.url}
-                  target='_blank'
-                  rel='noreferrer'
+                <div
                   className='
-                  text-[16px]
-                  group-hover:text-white
-                '
+                    overflow-hidden 
+                    text-ellipsis 
+                    whitespace-nowrap
+                  '
+                  title={d.title}
                 >
-                  {d.title}
-                </a>
+                  <a
+                    href={d.url}
+                    target='_blank'
+                    rel='noreferrer'
+                    className='
+                    text-[16px]
+                    group-hover:text-white
+                  '
+                  >
+                    {d.title}
+                  </a>
+                </div>
 
                 <div
                   className='
-                w-full 
-                overflow-hidden 
-                text-ellipsis 
-                whitespace-nowrap 
-                text-gray-700 
-                font-normal
-                mt-[8px]
-                text-[14px]
-                group-hover:text-white
-              '
+                    flex
+                    items-center
+                    text-gray-700 
+                    font-normal
+                    mt-[8px]
+                    mb-[4px]
+                    text-[14px]
+                    group-hover:text-white
+                  '
+                  title={d.url}
                 >
                   <IMdiLinkVariant className='inline-block mr-[4px]' />
-                  {d.url}
+                  <span
+                    className='
+                    flex-1
+                    overflow-hidden 
+                    text-ellipsis 
+                    whitespace-nowrap 
+                  '
+                  >
+                    {d.url}
+                  </span>
                 </div>
+                <div
+                  className='
+                  flex
+                  items-center
+                  text-gray-700 
+                  font-normal 
+                  text-[14px] 
+                  group-hover:text-white
+                '
+                >
+                  <IMdiClockTimeSevenOutline className='inline-block mr-[4px]' />
+                  <span
+                    className='
+                    flex-1
+                    overflow-hidden 
+                    text-ellipsis 
+                    whitespace-nowrap 
+                  '
+                  >
+                    {d.lastModifiedTime}
+                  </span>
+                </div>
+                {d.parentTitles?.length > 0 ? (
+                  <div
+                    className='
+                      flex
+                      items-center
+                      text-gray-700 
+                      font-normal 
+                      text-[14px] 
+                      group-hover:text-white
+                      mt-[4px]
+                    '
+                  >
+                    <IMdiFolderOutline className='inline-block mr-[4px]' />
+                    <span
+                      className='
+                        flex-1
+                        overflow-hidden 
+                        text-ellipsis 
+                        whitespace-nowrap 
+                      '
+                    >
+                      {d.parentTitles[d.parentTitles.length - 1]}
+                    </span>
+                  </div>
+                ) : null}
               </div>
             )
           })}
