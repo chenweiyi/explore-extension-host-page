@@ -43,7 +43,16 @@ export default defineConfig({
       ],
       eslintrc: {
         enabled: true
-      }
+      },
+      imports: [
+        'react',
+        'ahooks',
+        {
+          'lodash-es': ['isNil'],
+          clsx: [['default', 'clsx']],
+          dayjs: [['default', 'dayjs']]
+        }
+      ]
     }),
     Icons({
       compiler: 'jsx',

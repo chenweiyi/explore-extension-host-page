@@ -1,20 +1,19 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import '@pages/newtab/Newtab.css'
-import useStorage from '@src/shared/hooks/useStorage'
-import exampleThemeStorage from '@src/shared/storages/exampleThemeStorage'
+// import useStorage from '@src/shared/hooks/useStorage'
+// import exampleThemeStorage from '@src/shared/storages/exampleThemeStorage'
 import withSuspense from '@src/shared/hoc/withSuspense'
-import { isNil } from 'lodash-es'
-import clsx from 'clsx'
-import logo from '@assets/img/tab-icon-48.png'
-import dayjs from 'dayjs'
+import LeftMenu from './components/LeftMenu'
+import RightHead from './components/RightHead'
+import RightContent from './components/RightContent'
 
-interface ICategoryKey extends chrome.bookmarks.BookmarkTreeNode {
+export interface ICategoryKey extends chrome.bookmarks.BookmarkTreeNode {
   parentIds?: Set<string>
   parentTitles?: string[]
   lastModifiedTime?: string
 }
 
-type ICategoryData = Map<ICategoryKey, ICategoryKey[]>
+export type ICategoryData = Map<ICategoryKey, ICategoryKey[]>
 
 const Newtab = () => {
   // const theme = useStorage(exampleThemeStorage)
@@ -28,7 +27,7 @@ const Newtab = () => {
 
   const mapRes: ICategoryData = new Map()
 
-  function processBookmarkNodes2(
+  function processBookmarkNodes(
     nodes: ICategoryKey[],
     parentNode?: ICategoryKey
   ) {
@@ -59,7 +58,7 @@ const Newtab = () => {
           )
         }
         // 递归处理子节点
-        processBookmarkNodes2(node.children, node)
+        processBookmarkNodes(node.children, node)
       }
     }
   }
@@ -67,7 +66,7 @@ const Newtab = () => {
   function traverseCategoryData() {
     chrome.bookmarks.getTree(function (bookmarkTreeNodes) {
       console.log('bookmarkTreeNodes:', bookmarkTreeNodes)
-      processBookmarkNodes2(bookmarkTreeNodes)
+      processBookmarkNodes(bookmarkTreeNodes)
       const allKey = {
         id: '-1',
         title: '全部'
@@ -100,11 +99,6 @@ const Newtab = () => {
     )
   }
 
-  function search(e: React.FormEvent<HTMLInputElement>) {
-    const value = e.currentTarget.value
-    setSearchVal(value)
-  }
-
   useEffect(() => {
     traverseCategoryData()
   }, [])
@@ -123,7 +117,24 @@ const Newtab = () => {
     changeFilterDataByActiveFolder()
   }, [activeFolder, categoryData.size, folders.length, searchVal])
 
-  console.log('folders:', folders)
+  useUpdateEffect(() => {
+    // activeFolder改变时，存储当前activeFolder
+    chrome.storage.sync.get(['saveSelectFolder'], function (result) {
+      if (result.saveSelectFolder) {
+        chrome.storage.sync.set({ activeFolder })
+      } else {
+        chrome.storage.sync.set({ activeFolder: '-1' })
+      }
+    })
+  }, [activeFolder])
+
+  useEffect(() => {
+    chrome.storage.sync.get(['activeFolder'], function (result) {
+      setActiveFolder(result.activeFolder || '-1')
+    })
+  }, [])
+
+  // console.log('folders:', folders)
 
   return (
     <div
@@ -140,72 +151,11 @@ const Newtab = () => {
         shadow-lg
       '
     >
-      <div
-        className='
-        left 
-        w-[300px] 
-        flex 
-        flex-col 
-        items-stretch 
-        bg-gray-300
-        rounded-l-[8px]
-        px-[16px]
-        py-[16px]
-        overflow-hidden
-      '
-      >
-        <div
-          className='
-          logo
-          text-[30px]
-          px-[12px]
-          mb-[16px]
-          h-[60px]
-        '
-        >
-          <img src={logo} className='App-logo h-[48px]' alt='logo' />
-        </div>
-        <div
-          className='
-          title
-          text-[12px]
-          mb-[16px]
-          text-gray-500
-          px-[12px]
-        '
-        >
-          文件夹
-        </div>
-        <div className='flex-1 flex flex-col items-stretch overflow-y-auto'>
-          {folders.map((folder) => {
-            return (
-              <span
-                key={folder.id}
-                className={clsx([
-                  'folder-item',
-                  'rounded-[4px]',
-                  'px-[12px]',
-                  'py-[4px]',
-                  'mr-[8px]',
-                  'mb-[8px]',
-                  'text-[16px]',
-                  'cursor-pointer',
-                  'flex',
-                  'items-center',
-                  'hover:text-blue-600',
-                  activeFolder === folder.id
-                    ? 'text-blue-600 font-semibold'
-                    : 'text-black'
-                ])}
-                onClick={() => setActiveFolder(folder.id)}
-              >
-                <IMdiFolderOutline className='inline-block mr-[20px]' />
-                {folder.title}
-              </span>
-            )
-          })}
-        </div>
-      </div>
+      <LeftMenu
+        folders={folders}
+        activeFolder={activeFolder}
+        setActiveFolder={setActiveFolder}
+      />
       <div
         className='
         right 
@@ -220,184 +170,8 @@ const Newtab = () => {
         rounded-r-[8px]
       '
       >
-        <div
-          className='
-          header
-          h-[72px] 
-          py-[4px] 
-          px-[16px] 
-          flex
-          justify-between
-          items-center
-          border-b-[1px]
-          border-gray-300
-          border-solid
-        '
-        >
-          <div className='search relative'>
-            <input
-              type='text'
-              placeholder='请搜索'
-              className='
-                h-[30px]
-                w-[300px]
-                bg-white
-                appearance-none
-                border
-                border-slate-400
-                border-solid
-                text-slate-500
-                outline-0
-                pl-[24px]
-                rounded-[4px]
-              '
-              onInput={(e) => search(e)}
-            />
-            <IMdiMagnify className='absolute left-[6px] top-[8px] text-cyan-500' />
-          </div>
-          <div className='user flex items-center'>
-            <IMdiAccount className='text-cyan-500 text-[16px] mr-[4px]' />
-            <span className='text-slate-500 text-[16px]'>User</span>
-          </div>
-        </div>
-        <div
-          className='
-            app-content
-            flex-1
-            px-[16px]
-            py-[12px]
-            grid
-            grid-cols-3
-            grid-rows-[128px]
-            auto-rows-[128px]
-            gap-x-[16px]
-            gap-y-[16px]
-            overflow-y-auto
-          '
-        >
-          {filterData?.map((d) => {
-            return (
-              <div
-                className='
-                item
-                flex
-                flex-col
-                items-stretch
-                border 
-                border-cyan-300
-                px-[8px] 
-                py-[12px] 
-                rounded-[4px] 
-                bg-cyan-200
-                text-black
-                font-medium
-                cursor-pointer
-                shadow-normal
-                hover:font-bold
-                hover:bg-cyan-500
-                hover:shadow-active
-                group
-              '
-                key={d.id}
-                onClick={() => window.open(d.url)}
-              >
-                <div
-                  className='
-                    overflow-hidden 
-                    text-ellipsis 
-                    whitespace-nowrap
-                  '
-                  title={d.title}
-                >
-                  <a
-                    href={d.url}
-                    target='_blank'
-                    rel='noreferrer'
-                    className='
-                    text-[16px]
-                    group-hover:text-white
-                  '
-                  >
-                    {d.title}
-                  </a>
-                </div>
-
-                <div
-                  className='
-                    flex
-                    items-center
-                    text-gray-700 
-                    font-normal
-                    mt-[8px]
-                    mb-[4px]
-                    text-[14px]
-                    group-hover:text-white
-                  '
-                  title={d.url}
-                >
-                  <IMdiLinkVariant className='inline-block mr-[4px]' />
-                  <span
-                    className='
-                    flex-1
-                    overflow-hidden 
-                    text-ellipsis 
-                    whitespace-nowrap 
-                  '
-                  >
-                    {d.url}
-                  </span>
-                </div>
-                <div
-                  className='
-                  flex
-                  items-center
-                  text-gray-700 
-                  font-normal 
-                  text-[14px] 
-                  group-hover:text-white
-                '
-                >
-                  <IMdiClockTimeSevenOutline className='inline-block mr-[4px]' />
-                  <span
-                    className='
-                    flex-1
-                    overflow-hidden 
-                    text-ellipsis 
-                    whitespace-nowrap 
-                  '
-                  >
-                    {d.lastModifiedTime}
-                  </span>
-                </div>
-                {d.parentTitles?.length > 0 ? (
-                  <div
-                    className='
-                      flex
-                      items-center
-                      text-gray-700 
-                      font-normal 
-                      text-[14px] 
-                      group-hover:text-white
-                      mt-[4px]
-                    '
-                  >
-                    <IMdiFolderOutline className='inline-block mr-[4px]' />
-                    <span
-                      className='
-                        flex-1
-                        overflow-hidden 
-                        text-ellipsis 
-                        whitespace-nowrap 
-                      '
-                    >
-                      {d.parentTitles[d.parentTitles.length - 1]}
-                    </span>
-                  </div>
-                ) : null}
-              </div>
-            )
-          })}
-        </div>
+        <RightHead setSearchVal={setSearchVal} />
+        <RightContent filterData={filterData} />
       </div>
     </div>
   )

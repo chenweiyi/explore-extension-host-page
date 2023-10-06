@@ -1,0 +1,155 @@
+import React from 'react'
+// import useStorage from '@src/shared/hooks/useStorage'
+// import exampleThemeStorage from '@src/shared/storages/exampleThemeStorage'
+import withSuspense from '@src/shared/hoc/withSuspense'
+import { ICategoryKey } from '../Newtab'
+
+interface IRightContent {
+  [str: string]: unknown
+  filterData: Array<ICategoryKey>
+}
+
+const RightContent = (props: IRightContent) => {
+  return (
+    <div
+      className='
+        app-content
+        flex-1
+        px-[16px]
+        py-[12px]
+        grid
+        grid-cols-3
+        grid-rows-[128px]
+        auto-rows-[128px]
+        gap-x-[16px]
+        gap-y-[16px]
+        overflow-y-auto
+      '
+    >
+      {props.filterData?.map((d) => {
+        return (
+          <div
+            className='
+              item
+              flex
+              flex-col
+              items-stretch
+              border 
+              border-cyan-300
+              px-[8px] 
+              py-[12px] 
+              rounded-[4px] 
+              bg-cyan-200
+              text-black
+              font-medium
+              cursor-pointer
+              shadow-normal
+              hover:font-bold
+              hover:bg-cyan-500
+              hover:shadow-active
+              group
+            '
+            key={d.id}
+            onClick={() => window.open(d.url)}
+          >
+            <div
+              className='
+                overflow-hidden 
+                text-ellipsis 
+                whitespace-nowrap
+              '
+              title={d.title}
+            >
+              <a
+                href={d.url}
+                target='_blank'
+                rel='noreferrer'
+                className='
+                  text-[16px]
+                  group-hover:text-white
+                '
+              >
+                {d.title}
+              </a>
+            </div>
+
+            <div
+              className='
+                flex
+                items-center
+                text-gray-700 
+                font-normal
+                mt-[8px]
+                mb-[4px]
+                text-[14px]
+                group-hover:text-white
+              '
+              title={d.url}
+            >
+              <IMdiLinkVariant className='inline-block mr-[4px]' />
+              <span
+                className='
+                  flex-1
+                  overflow-hidden 
+                  text-ellipsis 
+                  whitespace-nowrap 
+                '
+              >
+                {d.url}
+              </span>
+            </div>
+            <div
+              className='
+                flex
+                items-center
+                text-gray-700 
+                font-normal 
+                text-[14px] 
+                group-hover:text-white
+              '
+            >
+              <IMdiClockTimeSevenOutline className='inline-block mr-[4px]' />
+              <span
+                className='
+                  flex-1
+                  overflow-hidden 
+                  text-ellipsis 
+                  whitespace-nowrap 
+                '
+              >
+                {d.lastModifiedTime}
+              </span>
+            </div>
+            {d.parentTitles?.length > 0 ? (
+              <div
+                className='
+                  flex
+                  items-center
+                  text-gray-700 
+                  font-normal 
+                  text-[14px] 
+                  group-hover:text-white
+                  mt-[4px]
+                '
+              >
+                <IMdiFolderOutline className='inline-block mr-[4px]' />
+                <span
+                  className='
+                    flex-1
+                    overflow-hidden 
+                    text-ellipsis 
+                    whitespace-nowrap 
+                  '
+                >
+                  {d.parentTitles[d.parentTitles.length - 1]}
+                </span>
+              </div>
+            ) : null}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+export default withSuspense(RightContent)
