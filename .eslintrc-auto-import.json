@@ -104,6 +104,7 @@
     "useWhyDidYouUpdate": true,
     "isNil": true,
     "clsx": true,
-    "dayjs": true
+    "dayjs": true,
+    "axios": true
   }
 }

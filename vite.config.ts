@@ -50,7 +50,8 @@ export default defineConfig({
         {
           'lodash-es': ['isNil'],
           clsx: [['default', 'clsx']],
-          dayjs: [['default', 'dayjs']]
+          dayjs: [['default', 'dayjs']],
+          axios: [['default', 'axios']]
         }
       ]
     }),

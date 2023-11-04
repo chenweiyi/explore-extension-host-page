@@ -1,10 +1,12 @@
 import React from 'react'
 import withSuspense from '@src/shared/hoc/withSuspense'
 import logo from '@assets/img/tab-icon-48.png'
-import { ICategoryKey } from '../Newtab'
+import { Classes, ICategoryKey } from '../Newtab'
 
 interface ILeftMenu {
   [str: string]: unknown
+  activeClass: string
+  setActiveClass: (activeClass: string) => void
   folders: Array<ICategoryKey>
   activeFolder: string
   setActiveFolder: (activeFolder: string) => void
@@ -16,11 +18,11 @@ const LeftMenu = (props: ILeftMenu) => {
   return (
     <div
       className='
-        left 
-        w-[300px] 
-        flex 
-        flex-col 
-        items-stretch 
+        left
+        w-[300px]
+        flex
+        flex-col
+        items-stretch
         bg-gray-300
         rounded-l-[8px]
         px-[16px]
@@ -42,13 +44,35 @@ const LeftMenu = (props: ILeftMenu) => {
       <div
         className='
           title
+          flex
+          items-center
           text-[12px]
           mb-[16px]
           text-gray-500
           px-[12px]
         '
       >
-        文件夹
+        <span
+          className={clsx([
+            'mr-[12px]',
+            'cursor-pointer',
+            'hover:text-blue-500',
+            props.activeClass === '本地' ? 'text-blue-500 font-semibold' : ''
+          ])}
+          onClick={() => props.setActiveClass(Classes[0])}
+        >
+          本地
+        </span>
+        <span
+          className={clsx([
+            'cursor-pointer',
+            'hover:text-blue-500',
+            props.activeClass === 'github' ? 'text-blue-500 font-semibold' : ''
+          ])}
+          onClick={() => props.setActiveClass(Classes[1])}
+        >
+          Github
+        </span>
       </div>
       <div className='flex-1 flex flex-col items-stretch overflow-y-auto'>
         {props.folders.map((folder) => {

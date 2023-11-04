@@ -11,6 +11,7 @@ declare global {
   const IMdiFolderOutline: typeof import('~icons/mdi/folder-outline.jsx')['default']
   const IMdiLinkVariant: typeof import('~icons/mdi/link-variant.jsx')['default']
   const IMdiMagnify: typeof import('~icons/mdi/magnify.jsx')['default']
+  const axios: typeof import('axios')['default']
   const clsx: typeof import('clsx')['default']
   const createRef: typeof import('react')['createRef']
   const dayjs: typeof import('dayjs')['default']
