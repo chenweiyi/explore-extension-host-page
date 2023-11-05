@@ -1,13 +1,13 @@
 import React from 'react'
 import withSuspense from '@src/shared/hoc/withSuspense'
 import logo from '@assets/img/tab-icon-48.png'
-import { Classes, ICategoryKey } from '../Newtab'
+import { Classes, ICategoryKey, IGithubTag } from '../Newtab'
 
 interface ILeftMenu {
   [str: string]: unknown
   activeClass: string
   setActiveClass: (activeClass: string) => void
-  folders: Array<ICategoryKey>
+  folders: Array<ICategoryKey> | Array<IGithubTag>
   activeFolder: string
   setActiveFolder: (activeFolder: string) => void
 }

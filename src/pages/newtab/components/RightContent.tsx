@@ -2,11 +2,11 @@ import React from 'react'
 // import useStorage from '@src/shared/hooks/useStorage'
 // import exampleThemeStorage from '@src/shared/storages/exampleThemeStorage'
 import withSuspense from '@src/shared/hoc/withSuspense'
-import { ICategoryKey } from '../Newtab'
+import { ICategoryKey, IGithubBookmark } from '../Newtab'
 
 interface IRightContent {
   [str: string]: unknown
-  filterData: Array<ICategoryKey>
+  filterData: Array<ICategoryKey> | Array<IGithubBookmark>
 }
 
 const RightContent = (props: IRightContent) => {
@@ -34,11 +34,11 @@ const RightContent = (props: IRightContent) => {
               flex
               flex-col
               items-stretch
-              border 
+              border
               border-cyan-300
-              px-[8px] 
-              py-[12px] 
-              rounded-[4px] 
+              px-[8px]
+              py-[12px]
+              rounded-[4px]
               bg-cyan-200
               text-black
               font-medium
@@ -54,8 +54,8 @@ const RightContent = (props: IRightContent) => {
           >
             <div
               className='
-                overflow-hidden 
-                text-ellipsis 
+                overflow-hidden
+                text-ellipsis
                 whitespace-nowrap
               '
               title={d.title}
@@ -77,7 +77,7 @@ const RightContent = (props: IRightContent) => {
               className='
                 flex
                 items-center
-                text-gray-700 
+                text-gray-700
                 font-normal
                 mt-[8px]
                 mb-[4px]
@@ -90,44 +90,47 @@ const RightContent = (props: IRightContent) => {
               <span
                 className='
                   flex-1
-                  overflow-hidden 
-                  text-ellipsis 
-                  whitespace-nowrap 
+                  overflow-hidden
+                  text-ellipsis
+                  whitespace-nowrap
                 '
               >
                 {d.url}
               </span>
             </div>
-            <div
-              className='
+            {d.lastModifiedTime ? (
+              <div
+                className='
                 flex
                 items-center
-                text-gray-700 
-                font-normal 
-                text-[14px] 
+                text-gray-700
+                font-normal
+                text-[14px]
                 group-hover:text-white
               '
-            >
-              <IMdiClockTimeSevenOutline className='inline-block mr-[4px]' />
-              <span
-                className='
-                  flex-1
-                  overflow-hidden 
-                  text-ellipsis 
-                  whitespace-nowrap 
-                '
               >
-                {d.lastModifiedTime}
-              </span>
-            </div>
+                <IMdiClockTimeSevenOutline className='inline-block mr-[4px]' />
+                <span
+                  className='
+                  flex-1
+                  overflow-hidden
+                  text-ellipsis
+                  whitespace-nowrap
+                '
+                >
+                  {d.lastModifiedTime}
+                </span>
+              </div>
+            ) : null}
+
             {d.parentTitles?.length > 0 ? (
               <div
                 className='
                   flex
                   items-center
-                  text-gray-700 
-                  font-normal 
-                  text-[14px] 
+                  text-gray-700
+                  font-normal
+                  text-[14px]
                   group-hover:text-white
                   mt-[4px]
                 '
@@ -136,9 +139,9 @@ const RightContent = (props: IRightContent) => {
                 <span
                   className='
                     flex-1
-                    overflow-hidden 
-                    text-ellipsis 
-                    whitespace-nowrap 
+                    overflow-hidden
+                    text-ellipsis
+                    whitespace-nowrap
                   '
                 >
                   {d.parentTitles[d.parentTitles.length - 1]}

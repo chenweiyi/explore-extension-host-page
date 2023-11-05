@@ -15,21 +15,46 @@ export interface ICategoryKey extends chrome.bookmarks.BookmarkTreeNode {
   lastModifiedTime?: string
 }
 
+export interface IGithubRawBookmark {
+  url: string
+  title: string
+  tags: string[]
+}
+export interface IGithubBookmark {
+  url: string
+  title: string
+  tags: string[]
+  id: string
+}
+
+export interface IGithubTag {
+  title: string
+  id: string
+}
+
+export type IGithubBookmarkMap = Map<IGithubTag, IGithubBookmark[]>
+
 export enum Classes {
   本地,
   github
 }
 
-export type ICategoryData = Map<ICategoryKey, ICategoryKey[]>
+export type ICategoryDataMap = Map<ICategoryKey, ICategoryKey[]>
 
 const Newtab = () => {
   const [activeClass, setActiveClass] = useState(Classes[0])
   // key: 文件夹 value: 文件夹下的文件
-  const [categoryData, setCategoryData] = useState<ICategoryData>(new Map())
+  const [categoryData, setCategoryData] = useState<
+    ICategoryDataMap | IGithubBookmarkMap
+  >(new Map())
   // 左侧文件夹
-  const [folders, setFolders] = useState<Array<ICategoryKey>>([])
+  const [folders, setFolders] = useState<
+    Array<ICategoryKey> | Array<IGithubTag>
+  >([])
   // 当前文件下根据搜索条件渲染的数据
-  const [filterData, setFilterData] = useState<ICategoryKey[]>([])
+  const [filterData, setFilterData] = useState<
+    Array<ICategoryKey> | Array<IGithubBookmark>
+  >([])
   // 当前激活的文件夹
   const [activeFolder, setActiveFolder] = useState<string>('-1')
   // 搜索文本
@@ -38,7 +63,7 @@ const Newtab = () => {
   // 待排除的文件夹
   let excludeFolderStr = ''
 
-  const mapRes: ICategoryData = new Map()
+  const mapRes: ICategoryDataMap = new Map()
 
   function processBookmarkNodes(
     nodes: ICategoryKey[],
@@ -101,9 +126,9 @@ const Newtab = () => {
 
   function traverseCategoryData() {
     chrome.bookmarks.getTree(function (bookmarkTreeNodes) {
-      console.log('bookmarkTreeNodes:', bookmarkTreeNodes)
+      // console.log('bookmarkTreeNodes:', bookmarkTreeNodes)
       const filterNodes = filterTreeData(bookmarkTreeNodes)
-      console.log('filter done,', filterNodes)
+      // console.log('filter done,', filterNodes)
       processBookmarkNodes(filterNodes)
       const allKey = {
         id: '-1',
@@ -123,7 +148,9 @@ const Newtab = () => {
   }
 
   function changeFilterDataByActiveFolder() {
-    const data = categoryData.get(folders.find((f) => f.id === activeFolder))
+    const data = categoryData.get(
+      folders.find((f) => f.id === activeFolder)
+    ) as ICategoryKey[]
     console.log('data:', data)
     if (!data) return []
     setFilterData(
@@ -135,6 +162,54 @@ const Newtab = () => {
         )
       })
     )
+  }
+
+  function generateGithubData(rawData: IGithubRawBookmark[]) {
+    const data: IGithubBookmark[] = rawData
+      .map((d, i) => {
+        const item: IGithubBookmark = { ...d, id: i + '' }
+        return item
+      })
+      .filter((d) => {
+        const ex = excludeFolderStr.split(/,|，/).map((i) => unescape(i).trim())
+        if (ex.length === 0) return true
+        if (d.tags.find((t) => ex.find((e) => e === t))) {
+          return false
+        }
+        return true
+      })
+
+    const folders: IGithubTag[] = data.reduce((result, item) => {
+      item.tags.forEach((tag) => {
+        if (!result.find((r) => r === tag)) {
+          result.push({
+            title: tag,
+            id: tag
+          })
+        }
+      })
+      return result
+    }, [])
+
+    folders.unshift({
+      title: '全部',
+      id: '-1'
+    })
+
+    const bookmarkMap: IGithubBookmarkMap = new Map()
+
+    folders.forEach((folder) => {
+      let res: IGithubBookmark[] = []
+      if (folder.id === '-1') {
+        bookmarkMap.set(folder, data)
+      } else {
+        res = data.filter((d) => d.tags.find((tag) => tag === folder.id))
+        bookmarkMap.set(folder, res)
+      }
+    })
+
+    setFolders(folders)
+    setCategoryData(bookmarkMap)
   }
 
   async function fetchDataFromGithub() {
@@ -165,6 +240,7 @@ const Newtab = () => {
       if (content) {
         const json = JSON.parse(base64_to_utf8(content))
         console.log('json:', json)
+        generateGithubData(json as IGithubRawBookmark[])
       }
     } else {
       if (res.status === 404) {
@@ -208,6 +284,7 @@ const Newtab = () => {
       chrome.storage.sync.set({
         activeClass: result.saveSelectClass ? activeClass : Classes[0]
       })
+      setActiveFolder('-1')
       if (activeClass === Classes[0]) {
         traverseCategoryData()
       } else {
