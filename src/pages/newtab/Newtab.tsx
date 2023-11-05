@@ -161,7 +161,7 @@ const Newtab = () => {
     })
     console.log('res', res)
     if (res.status === 200) {
-      const { sha, content } = res.data
+      const { sha = '', content = '' } = res.data as any
       if (content) {
         const json = JSON.parse(base64_to_utf8(content))
         console.log('json:', json)
