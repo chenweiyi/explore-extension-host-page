@@ -9,6 +9,7 @@ const Popup = () => {
   // const theme = useStorage(exampleThemeStorage);
   const [saveSelectFolder, setSaveSelectFolder] = useState(true)
   const [saveSelectClass, setSaveSelectClass] = useState(true)
+  const [showOneWord, setShowOneWord] = useState(true)
   const [excludeFolders, setExcludeFolders] = useState('')
   const [owner, setOwner] = useState('')
   const [repo, setRepo] = useState('')
@@ -22,6 +23,10 @@ const Popup = () => {
   useUpdateEffect(() => {
     chrome.storage.sync.set({ saveSelectFolder })
   }, [saveSelectFolder])
+
+  useUpdateEffect(() => {
+    chrome.storage.sync.set({ showOneWord })
+  }, [showOneWord])
 
   useUpdateEffect(() => {
     chrome.storage.sync.set({ excludeFolders })
@@ -48,6 +53,7 @@ const Popup = () => {
       [
         'saveSelectClass',
         'saveSelectFolder',
+        'showOneWord',
         'excludeFolders',
         'owner',
         'repo',
@@ -57,6 +63,7 @@ const Popup = () => {
       (result) => {
         setSaveSelectClass(result.saveSelectClass)
         setSaveSelectFolder(result.saveSelectFolder)
+        setShowOneWord(result.showOneWord)
         setExcludeFolders(result.excludeFolders)
         setOwner(result.owner)
         setRepo(result.repo)
@@ -89,6 +96,17 @@ const Popup = () => {
               name='saveSelectFolder'
               checked={saveSelectFolder}
               onChange={(e) => setSaveSelectFolder(e.target.checked)}
+            />
+          </label>
+        </div>
+        <div className='content pl-[12px] pt-[12px]'>
+          <label className='flex cursor-pointer select-none'>
+            <span className='mr-[8px]'>显示一句话:</span>
+            <input
+              type='checkbox'
+              name='showOneWord'
+              checked={showOneWord}
+              onChange={(e) => setShowOneWord(e.target.checked)}
             />
           </label>
         </div>

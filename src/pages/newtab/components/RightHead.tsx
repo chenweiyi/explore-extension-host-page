@@ -16,9 +16,9 @@ const RightHead = (props: IRightHead) => {
     <div
       className='
         header
-        h-[72px] 
-        py-[4px] 
-        px-[16px] 
+        h-[72px]
+        py-[4px]
+        px-[16px]
         flex
         justify-between
         items-center
@@ -48,10 +48,10 @@ const RightHead = (props: IRightHead) => {
         />
         <IMdiMagnify className='absolute left-[6px] top-[8px] text-cyan-500' />
       </div>
-      <div className='user flex items-center'>
+      {/* <div className='user flex items-center'>
         <IMdiAccount className='text-cyan-500 text-[16px] mr-[4px]' />
         <span className='text-slate-500 text-[16px]'>User</span>
-      </div>
+      </div> */}
     </div>
   )
 }

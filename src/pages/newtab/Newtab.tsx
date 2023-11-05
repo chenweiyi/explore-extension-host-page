@@ -43,6 +43,7 @@ export type ICategoryDataMap = Map<ICategoryKey, ICategoryKey[]>
 
 const Newtab = () => {
   const [activeClass, setActiveClass] = useState(Classes[0])
+  const latestActiveClass = useLatest(activeClass)
   // key: 文件夹 value: 文件夹下的文件
   const [categoryData, setCategoryData] = useState<
     ICategoryDataMap | IGithubBookmarkMap
@@ -61,7 +62,10 @@ const Newtab = () => {
   const [searchVal, setSearchVal] = useState<string>('')
 
   // 待排除的文件夹
-  let excludeFolderStr = ''
+  const [excludeFolderStr, setExcludeFolderStr] = useState('')
+  const latestExcludeFolderStr = useLatest(excludeFolderStr)
+
+  const [showOneWord, setShowOneWord] = useState(true)
 
   const mapRes: ICategoryDataMap = new Map()
 
@@ -102,7 +106,10 @@ const Newtab = () => {
   }
 
   function filterTreeData(nodes: chrome.bookmarks.BookmarkTreeNode[]) {
-    const ex = excludeFolderStr.split(/,|，/).map((i) => unescape(i).trim())
+    const ex = latestExcludeFolderStr.current
+      .trim()
+      .split(/,|，/)
+      .map((i) => unescape(i).trim())
     if (ex.length === 0) return nodes
     return nodes.reduce((result, item) => {
       if (item.title && ex.find((e) => e === item.title)) {
@@ -171,7 +178,10 @@ const Newtab = () => {
         return item
       })
       .filter((d) => {
-        const ex = excludeFolderStr.split(/,|，/).map((i) => unescape(i).trim())
+        const ex = latestExcludeFolderStr.current
+          .trim()
+          .split(/,|，/)
+          .map((i) => unescape(i).trim())
         if (ex.length === 0) return true
         if (d.tags.find((t) => ex.find((e) => e === t))) {
           return false
@@ -273,7 +283,7 @@ const Newtab = () => {
     // activeFolder改变时，根据配置判断是否存储当前activeFolder
     chrome.storage.sync.get(['saveSelectFolder'], function (result) {
       chrome.storage.sync.set({
-        activeFolder: result.saveSelectFolder ? activeFolder : '-1'
+        activeFolder: result.saveSelectFolder === false ? '-1' : activeFolder
       })
     })
   }, [activeFolder])
@@ -282,7 +292,7 @@ const Newtab = () => {
     // activeClass改变时，根据配置判断是否存储当前activeClass
     chrome.storage.sync.get(['saveSelectClass'], function (result) {
       chrome.storage.sync.set({
-        activeClass: result.saveSelectClass ? activeClass : Classes[0]
+        activeClass: result.saveSelectClass === false ? Classes[0] : activeClass
       })
       setActiveFolder('-1')
       if (activeClass === Classes[0]) {
@@ -295,11 +305,12 @@ const Newtab = () => {
 
   useEffect(() => {
     chrome.storage.sync.get(
-      ['activeClass', 'activeFolder', 'excludeFolders'],
+      ['activeClass', 'activeFolder', 'excludeFolders', 'showOneWord'],
       function (result) {
         setActiveClass(result.activeClass || Classes[0])
         setActiveFolder(result.activeFolder || '-1')
-        excludeFolderStr = result.excludeFolders || ''
+        setExcludeFolderStr(result.excludeFolders || '')
+        setShowOneWord(result.showOneWord !== false)
         if (!result.activeClass || result.activeClass === Classes[0]) {
           traverseCategoryData()
         } else {
@@ -307,13 +318,42 @@ const Newtab = () => {
         }
       }
     )
+
+    // 监听setting变化
+    chrome.runtime.onMessage.addListener(function (
+      request,
+      sender,
+      sendResponse
+    ) {
+      if (request.action === 'settingUpdate') {
+        // 执行更新数据操作
+        if (
+          request.data &&
+          request.data.namespace === 'sync' &&
+          request.data.changes
+        ) {
+          if (request.data.changes.excludeFolders) {
+            setExcludeFolderStr(
+              request.data.changes.excludeFolders.newValue || ''
+            )
+          }
+          if (request.data.changes.showOneWord) {
+            setShowOneWord(request.data.changes.showOneWord.newValue)
+          }
+        }
+      }
+    })
   }, [])
 
   // console.log('folders:', folders)
 
   return (
-    <div
-      className='
+    <div className='w-full h-full flex justify-center items-center'>
+      <div className='absolute z-10 h-[7.5%] w-full flex justify-center items-center top-0 left-0'>
+        你好，world!
+      </div>
+      <div
+        className='
         app
         bg-white
         w-[80%]
@@ -325,16 +365,16 @@ const Newtab = () => {
         overflow-hidden
         shadow-lg
       '
-    >
-      <LeftMenu
-        activeClass={activeClass}
-        setActiveClass={setActiveClass}
-        folders={folders}
-        activeFolder={activeFolder}
-        setActiveFolder={setActiveFolder}
-      />
-      <div
-        className='
+      >
+        <LeftMenu
+          activeClass={activeClass}
+          setActiveClass={setActiveClass}
+          folders={folders}
+          activeFolder={activeFolder}
+          setActiveFolder={setActiveFolder}
+        />
+        <div
+          className='
         right
         flex-1
         flex
@@ -346,9 +386,10 @@ const Newtab = () => {
         border-solid
         rounded-r-[8px]
       '
-      >
-        <RightHead setSearchVal={setSearchVal} />
-        <RightContent filterData={filterData} />
+        >
+          <RightHead setSearchVal={setSearchVal} />
+          <RightContent filterData={filterData} />
+        </div>
       </div>
     </div>
   )
