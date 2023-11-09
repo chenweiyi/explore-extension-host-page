@@ -1,8 +1,9 @@
 import React from 'react'
-import '@pages/options/Options.css'
+// import '@pages/options/Options.css'
+import SettingOption from '@src/components/SettingOption'
 
 const Options: React.FC = () => {
-  return <div className='container text-lime-400'>Options</div>
+  return <SettingOption class='w-[600px]'></SettingOption>
 }
 
 export default Options
