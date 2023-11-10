@@ -9,7 +9,7 @@
   },
   "scripts": {
     "cz": "cz",
-    "build": "tsc --noEmit && vite build",
+    "build": "tsc --noEmit && vite build && pnpm run zip",
     "build:firefox": "tsc --noEmit && cross-env __FIREFOX__=true vite build",
     "build:watch": "cross-env __DEV__=true vite build -w",
     "build:firefox:watch": "cross-env __DEV__=true __FIREFOX__=true vite build -w",
@@ -18,7 +18,8 @@
     "dev": "npm run build:hmr && (run-p wss build:watch)",
     "dev:firefox": "npm run build:hmr && (run-p wss build:firefox:watch)",
     "test": "jest",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "zip": "node ./scripts/zip.js"
   },
   "type": "module",
   "dependencies": {
