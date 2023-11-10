@@ -57,6 +57,7 @@
     "@unocss/preset-attributify": "^0.55.7",
     "@unocss/transformer-attributify-jsx": "^0.55.7",
     "@vitejs/plugin-react": "2.2.0",
+    "adm-zip": "^0.5.10",
     "chokidar": "^3.5.3",
     "commitizen": "^4.3.0",
     "cross-env": "^7.0.3",
