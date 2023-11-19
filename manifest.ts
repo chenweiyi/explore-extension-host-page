@@ -27,6 +27,7 @@ const manifest: chrome.runtime.ManifestV3 = {
   icons: {
     128: 'tab-icon-128.png',
     48: 'tab-icon-48.png',
+    32: 'tab-icon-32.png',
     16: 'tab-icon-16.png'
   },
   // content_scripts: [
@@ -45,6 +46,7 @@ const manifest: chrome.runtime.ManifestV3 = {
         'assets/css/*.css',
         'tab-icon-128.png',
         'tab-icon-48.png',
+        'tab-icon-32.png',
         'tab-icon-16.png'
       ],
       matches: ['*://*/*']

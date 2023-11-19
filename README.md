@@ -11,14 +11,45 @@
 ## 效果图
 
 <div align="center">
-<img src="public/xg1.jpg" alt="效果"/>
+<img src="screenshots/xg1.jpg" alt="效果"/>
 </div>
 
 ## 配置项
 
 <div align="center">
-<img src="public/xg2.jpg" alt="配置"/>
+<img src="screenshots/xg2.jpg" alt="配置"/>
 </div>
+
+## 说明
+
+### 设置项说明
+
+- 记住选中的类别: 当你选择了`本地` 或者 `github` 时，下次打开 tab 或者刷新 tab 时会记住你选中的那个类别
+- 记住选中的文件夹: 当你选择了文件夹时，下次打开 tab 或者刷新 tab 时会记住你选中的那个类别
+- 显示一句话: 是否显示[一言](https://hitokoto.cn/)
+- 排除文件夹: 允许排除一些文件夹不显示，文件夹之间用逗号隔开，例如："电影，开发"
+
+#### Github 配置说明
+
+> 以下配置内容没有配置完整时，`github` 类别不可使用，一个实际可用的配置如下：
+>
+> ```json
+> {
+>   "github": {
+>     "owner": "chenweiyi",
+>     "repo": "bookmarks",
+>     "path": "bookmark.json",
+>     "token": "xxxxxx" // 个人 access token
+>   }
+> }
+> ```
+>
+> github 仓库参见： https://github.com/chenweiyi/bookmarks
+
+- 拥有者: 仓库拥有者
+- 仓库名: 仓库名称
+- 配置文件地址: 读取文件的地址，比如需要读取文件地址是`bookmark.json`
+- Personal Access Token: `access token`, 参见[Github Settings](https://github.com/settings/tokens?type=beta)
 
 ---
 
