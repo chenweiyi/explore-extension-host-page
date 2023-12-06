@@ -31,4 +31,4 @@
 
 ## 展示的效果如下：
 
-![Alt text](screenshots/image.png)
+![Alt text](screenshots/github-preview.png)

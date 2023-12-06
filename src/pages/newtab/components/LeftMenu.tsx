@@ -1,6 +1,6 @@
 import React from 'react'
 import withSuspense from '@src/shared/hoc/withSuspense'
-import logo from '@assets/img/tab-icon-48.png'
+import logo from '@assets/img/star48.png'
 import { Classes, ICategoryKey, IGithubTag } from '../Newtab'
 
 interface ILeftMenu {

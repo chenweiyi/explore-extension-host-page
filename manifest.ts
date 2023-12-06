@@ -17,7 +17,7 @@ const manifest: chrome.runtime.ManifestV3 = {
   action: {
     default_popup: 'src/pages/popup/index.html',
     default_icon: {
-      48: 'tab-icon-48.png'
+      48: 'star48.png'
     },
     default_title: 'my-tab'
   },
@@ -25,10 +25,10 @@ const manifest: chrome.runtime.ManifestV3 = {
     newtab: 'src/pages/newtab/index.html'
   },
   icons: {
-    128: 'tab-icon-128.png',
-    48: 'tab-icon-48.png',
-    32: 'tab-icon-32.png',
-    16: 'tab-icon-16.png'
+    '128': 'star128.png',
+    '48': 'star48.png',
+    '32': 'star32.png',
+    '16': 'star16.png'
   },
   // content_scripts: [
   //   {
@@ -44,10 +44,10 @@ const manifest: chrome.runtime.ManifestV3 = {
       resources: [
         'assets/js/*.js',
         'assets/css/*.css',
-        'tab-icon-128.png',
-        'tab-icon-48.png',
-        'tab-icon-32.png',
-        'tab-icon-16.png'
+        'star128.png',
+        'star48.png',
+        'star32.png',
+        'star16.png'
       ],
       matches: ['*://*/*']
     }

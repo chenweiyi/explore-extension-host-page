@@ -31,4 +31,4 @@ As you can see in the example above, the JSON file is an array of objects, with 
 
 ## The displayed effect is as follows:
 
-![Alt text](screenshots/image.png)
+![Alt text](screenshots/github-preview.png)

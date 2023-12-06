@@ -1,7 +1,7 @@
 [中文文档](./README_zh.md)
 
 <div align="center">
-<img src="public/tab-icon-128.png" alt="logo"/>
+<img src="public/star128.png" alt="logo"/>
 <h1> A better browser extension bookmarking tool </h1>
 
 ![](https://img.shields.io/badge/React-61DAFB?style=flat-square&logo=react&logoColor=black)
@@ -13,7 +13,7 @@
 ## Rendered Images
 
 <div align="center">
-<img src="screenshots/xg1.jpg" alt="Effect"/>
+<img src="screenshots/xgt.png" alt="Effect"/>
 </div>
 
 ## Configuration Options
