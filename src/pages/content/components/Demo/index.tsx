@@ -1,7 +1,8 @@
 import { createRoot } from 'react-dom/client'
 import App from '@src/pages/content/components/Demo/app'
 import refreshOnUpdate from 'virtual:reload-on-update-in-view'
-import { attachTwindStyle } from '@src/shared/style/twind'
+// import { attachTwindStyle } from '@src/shared/style/twind'
+import 'virtual:uno.css'
 
 refreshOnUpdate('pages/content')
 
@@ -16,6 +17,6 @@ rootIntoShadow.id = 'shadow-root'
 const shadowRoot = root.attachShadow({ mode: 'open' })
 shadowRoot.appendChild(rootIntoShadow)
 
-attachTwindStyle(rootIntoShadow, shadowRoot)
+// attachTwindStyle(rootIntoShadow, shadowRoot)
 
 createRoot(rootIntoShadow).render(<App />)
