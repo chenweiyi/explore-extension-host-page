@@ -9,6 +9,10 @@ import RightHead from './components/RightHead'
 import RightContent from './components/RightContent'
 import { base64_to_utf8 } from '@root/utils/tool'
 
+export type IError = {
+  msg: string
+  from: string
+}
 export interface ICategoryKey extends chrome.bookmarks.BookmarkTreeNode {
   parentIds?: string[]
   parentTitles?: string[]
@@ -92,8 +96,11 @@ const Newtab = () => {
   const [excludeFolderStr, setExcludeFolderStr] = useState('')
   const latestExcludeFolderStr = useLatest(excludeFolderStr)
 
+  // 一句话
   const [showOneWord, setShowOneWord] = useState(true)
   const [wordInfo, setWordInfo] = useState<IWordInfo | null>(null)
+  // 错误信息
+  const [error, setError] = useState<IError | null>(null)
 
   const mapRes: ICategoryDataMap = new Map()
 
@@ -179,6 +186,7 @@ const Newtab = () => {
       )
       console.log('mapRes:', mapRes)
       setCategoryData(mapRes)
+      setError(null)
     })
   }
 
@@ -248,6 +256,8 @@ const Newtab = () => {
 
     setFolders(folders)
     setCategoryData(bookmarkMap)
+
+    setError(null)
   }
 
   async function fetchDataFromGithub() {
@@ -258,38 +268,66 @@ const Newtab = () => {
       'authCode'
     ])
     if (!owner || !repo || !path || !authCode) {
-      window.alert('github配置不全，请检查github配置字段！')
+      setError({
+        msg: 'github配置不全，请检查github配置字段！',
+        from: 'fetchDataFromGithub'
+      })
       return
     }
     const octokit = new Octokit({
       auth: authCode
     })
-    const res = await octokit.rest.repos.getContent({
-      mediaType: {
-        format: 'json'
-      },
-      owner,
-      repo,
-      path
-    })
-    console.log('res', res)
-    if (res.status === 200) {
-      const { sha = '', content = '' } = res.data as any
-      if (content) {
-        const json = JSON.parse(base64_to_utf8(content))
-        console.log('json:', json)
-        generateGithubData(json as IGithubRawBookmark[])
-      }
-    } else {
-      if (res.status === 404) {
-        window.alert(
-          'github getContent接口查询资源不存在，请检查文件名称等配置'
-        )
-      } else if (res.status === 403) {
-        window.alert('github getContent接口查询无权限，请检查authCode等配置')
+
+    try {
+      const res = await octokit.rest.repos.getContent({
+        mediaType: {
+          format: 'json'
+        },
+        owner,
+        repo,
+        path
+      })
+      console.log('res', res)
+      if (res.status === 200) {
+        const { sha = '', content = '' } = res.data as any
+        if (content) {
+          try {
+            const json: IGithubRawBookmark[] = JSON.parse(
+              base64_to_utf8(content)
+            )
+            console.log('json:', json)
+            generateGithubData(json)
+          } catch (e) {
+            setError({
+              msg: 'JSON格式错误，请检查文件内容',
+              from: 'fetchDataFromGithub'
+            })
+          }
+        }
       } else {
-        window.alert('github getContent接口查询失败')
+        if (res.status === 404) {
+          setError({
+            msg: 'github getContent接口查询资源不存在，请检查文件名称等配置',
+            from: 'fetchDataFromGithub'
+          })
+        } else if (res.status === 403) {
+          setError({
+            msg: 'github getContent接口查询无权限，请检查authCode等配置',
+            from: 'fetchDataFromGithub'
+          })
+        } else {
+          setError({
+            msg: 'github getContent接口查询失败',
+            from: 'fetchDataFromGithub'
+          })
+        }
       }
+    } catch (e) {
+      console.error('e:', e.message)
+      setError({
+        msg: e.message,
+        from: 'fetchDataFromGithub'
+      })
     }
   }
 
@@ -451,7 +489,7 @@ const Newtab = () => {
       '
         >
           <RightHead setSearchVal={setSearchVal} />
-          <RightContent filterData={filterData} />
+          <RightContent filterData={filterData} error={error} />
         </div>
       </div>
     </div>

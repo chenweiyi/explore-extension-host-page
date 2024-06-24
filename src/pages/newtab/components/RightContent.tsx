@@ -2,11 +2,12 @@ import React from 'react'
 // import useStorage from '@src/shared/hooks/useStorage'
 // import exampleThemeStorage from '@src/shared/storages/exampleThemeStorage'
 import withSuspense from '@src/shared/hoc/withSuspense'
-import { ICategoryKey, IGithubBookmark } from '../Newtab'
+import { ICategoryKey, IError, IGithubBookmark } from '../Newtab'
 
 interface IRightContent {
   [str: string]: unknown
   filterData: Array<ICategoryKey> | Array<IGithubBookmark>
+  error: IError | null
 }
 
 const RightContent = (props: IRightContent) => {
@@ -26,10 +27,22 @@ const RightContent = (props: IRightContent) => {
         overflow-y-auto
       '
     >
-      {props.filterData?.map((d) => {
-        return (
-          <div
-            className='
+      {props.error ? (
+        <div className='px-[32px] py-[40px] text-[16px]'>
+          <div className='mb-[12px]'>
+            <span>Error:</span>
+            <span className='ml-[12px] text-red-500'>{props.error.msg}</span>
+          </div>
+          <div>
+            <span>From:</span>
+            <span className='ml-[12px] text-red-500'>{props.error.from}</span>
+          </div>
+        </div>
+      ) : (
+        props.filterData?.map((d) => {
+          return (
+            <div
+              className='
               item
               flex
               flex-col
@@ -49,32 +62,32 @@ const RightContent = (props: IRightContent) => {
               hover:shadow-active
               group
             '
-            key={d.id}
-            onClick={() => window.open(d.url)}
-          >
-            <div
-              className='
+              key={d.id}
+              onClick={() => window.open(d.url)}
+            >
+              <div
+                className='
                 overflow-hidden
                 text-ellipsis
                 whitespace-nowrap
               '
-              title={d.title}
-            >
-              <a
-                href={d.url}
-                target='_blank'
-                rel='noreferrer'
-                className='
+                title={d.title}
+              >
+                <a
+                  href={d.url}
+                  target='_blank'
+                  rel='noreferrer'
+                  className='
                   text-[16px]
                   group-hover:text-white
                 '
-              >
-                {d.title}
-              </a>
-            </div>
+                >
+                  {d.title}
+                </a>
+              </div>
 
-            <div
-              className='
+              <div
+                className='
                 flex
                 items-center
                 text-gray-700
@@ -84,32 +97,9 @@ const RightContent = (props: IRightContent) => {
                 text-[14px]
                 group-hover:text-white
               '
-              title={d.url}
-            >
-              <IMdiLinkVariant className='inline-block mr-[4px]' />
-              <span
-                className='
-                  flex-1
-                  overflow-hidden
-                  text-ellipsis
-                  whitespace-nowrap
-                '
+                title={d.url}
               >
-                {d.url}
-              </span>
-            </div>
-            {d.lastModifiedTime ? (
-              <div
-                className='
-                flex
-                items-center
-                text-gray-700
-                font-normal
-                text-[14px]
-                group-hover:text-white
-              '
-              >
-                <IMdiClockTimeSevenOutline className='inline-block mr-[4px]' />
+                <IMdiLinkVariant className='inline-block mr-[4px]' />
                 <span
                   className='
                   flex-1
@@ -118,14 +108,37 @@ const RightContent = (props: IRightContent) => {
                   whitespace-nowrap
                 '
                 >
-                  {d.lastModifiedTime}
+                  {d.url}
                 </span>
               </div>
-            ) : null}
+              {d.lastModifiedTime ? (
+                <div
+                  className='
+                flex
+                items-center
+                text-gray-700
+                font-normal
+                text-[14px]
+                group-hover:text-white
+              '
+                >
+                  <IMdiClockTimeSevenOutline className='inline-block mr-[4px]' />
+                  <span
+                    className='
+                  flex-1
+                  overflow-hidden
+                  text-ellipsis
+                  whitespace-nowrap
+                '
+                  >
+                    {d.lastModifiedTime}
+                  </span>
+                </div>
+              ) : null}
 
-            {d.parentTitles?.length > 0 ? (
-              <div
-                className='
+              {d.parentTitles?.length > 0 ? (
+                <div
+                  className='
                   flex
                   items-center
                   text-gray-700
@@ -134,23 +147,24 @@ const RightContent = (props: IRightContent) => {
                   group-hover:text-white
                   mt-[4px]
                 '
-              >
-                <IMdiFolderOutline className='inline-block mr-[4px]' />
-                <span
-                  className='
+                >
+                  <IMdiFolderOutline className='inline-block mr-[4px]' />
+                  <span
+                    className='
                     flex-1
                     overflow-hidden
                     text-ellipsis
                     whitespace-nowrap
                   '
-                >
-                  {d.parentTitles[d.parentTitles.length - 1]}
-                </span>
-              </div>
-            ) : null}
-          </div>
-        )
-      })}
+                  >
+                    {d.parentTitles[d.parentTitles.length - 1]}
+                  </span>
+                </div>
+              ) : null}
+            </div>
+          )
+        })
+      )}
     </div>
   )
 }
