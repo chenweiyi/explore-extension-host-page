@@ -22,9 +22,9 @@ const RightHead = (props: IRightHead) => {
         flex
         justify-between
         items-center
-        border-b-[1px]
-        border-gray-300
-        border-solid
+        border-b-1px
+        border-b-[#d1d5db]
+        border-b-solid
       '
     >
       <div className='search relative'>

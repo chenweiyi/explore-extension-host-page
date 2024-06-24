@@ -463,6 +463,9 @@ const Newtab = () => {
         flex-row
         items-stretch
         rounded-[8px]
+        border-1px
+        border-[#d1d5db]
+        border-solid
         overflow-hidden
         shadow-lg
       '
@@ -481,11 +484,6 @@ const Newtab = () => {
         flex
         flex-col
         items-stretch
-        border-y-[1px]
-        border-r-[1px]
-        border-gray-300
-        border-solid
-        rounded-r-[8px]
       '
         >
           <RightHead setSearchVal={setSearchVal} />

@@ -9,6 +9,7 @@ import manifest from './manifest'
 import Icons from 'unplugin-icons/vite'
 import IconsResolver from 'unplugin-icons/resolver'
 import AutoImport from 'unplugin-auto-import/vite'
+import UnoCSS from 'unocss/vite'
 
 const rootDir = resolve(__dirname)
 const srcDir = resolve(rootDir, 'src')
@@ -33,6 +34,7 @@ export default defineConfig({
     }
   },
   plugins: [
+    UnoCSS(),
     AutoImport({
       dts: true,
       resolvers: [
