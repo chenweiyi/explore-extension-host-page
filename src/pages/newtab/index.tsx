@@ -6,7 +6,7 @@ import refreshOnUpdate from 'virtual:reload-on-update-in-view'
 // import { attachTwindStyle } from '@src/shared/style/twind'
 import 'virtual:uno.css'
 
-refreshOnUpdate('pages/newtab')
+refreshOnUpdate(['pages/newtab', 'uno.config'])
 
 function init() {
   const appContainer = document.querySelector('#app-container')
