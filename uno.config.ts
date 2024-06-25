@@ -28,13 +28,13 @@ export default defineConfig({
     [
       'box-shadow-sample',
       {
-        'box-shadow': 'inset 0 0 2px 2px rgb(208 203 215 / 40%)'
+        'box-shadow': 'inset 0 0 4px 4px rgb(208 203 215 / 40%)'
       }
     ],
     [
       'box-shadow-sample-hover',
       {
-        'box-shadow': 'inset 0 0 3px 3px rgb(208 203 215 / 80%)'
+        'box-shadow': 'inset 0 0 2px 2px rgb(208 203 215 / 80%)'
       }
     ]
   ]

@@ -10,6 +10,7 @@ import Icons from 'unplugin-icons/vite'
 import IconsResolver from 'unplugin-icons/resolver'
 import AutoImport from 'unplugin-auto-import/vite'
 import UnoCSS from 'unocss/vite'
+import { AntDesignResolver } from './utils/antd-resolver'
 
 const rootDir = resolve(__dirname)
 const srcDir = resolve(rootDir, 'src')
@@ -17,6 +18,7 @@ const pagesDir = resolve(srcDir, 'pages')
 const assetsDir = resolve(srcDir, 'assets')
 const outDir = resolve(rootDir, 'dist')
 const publicDir = resolve(rootDir, 'public')
+const utilsDir = resolve(rootDir, 'utils')
 
 const isDev = process.env.__DEV__ === 'true'
 const isProduction = !isDev
@@ -30,7 +32,8 @@ export default defineConfig({
       '@root': rootDir,
       '@src': srcDir,
       '@assets': assetsDir,
-      '@pages': pagesDir
+      '@pages': pagesDir,
+      '@utils': utilsDir
     }
   },
   plugins: [
@@ -41,6 +44,9 @@ export default defineConfig({
         IconsResolver({
           prefix: 'i',
           extension: 'jsx'
+        }),
+        AntDesignResolver({
+          resolveIcons: true
         })
       ],
       eslintrc: {
@@ -102,6 +108,13 @@ export default defineConfig({
           }
           return `assets/[ext]/${name}.chunk.[ext]`
         }
+      },
+      onwarn: (warning, warn) => {
+        // fix build warning: node_modules/xxx level directives cause errors when bundled, 'use client' was ignored.
+        if (warning.code === 'MODULE_LEVEL_DIRECTIVE') {
+          return
+        }
+        warn(warning)
       }
     }
   }

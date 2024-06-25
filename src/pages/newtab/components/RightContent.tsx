@@ -2,7 +2,7 @@ import React from 'react'
 // import useStorage from '@src/shared/hooks/useStorage'
 // import exampleThemeStorage from '@src/shared/storages/exampleThemeStorage'
 import withSuspense from '@src/shared/hoc/withSuspense'
-import { ICategoryKey, IError, IGithubBookmark } from '../Newtab'
+import { ICategoryKey, IError, IGithubBookmark } from '../Tab'
 
 interface IRightContent {
   [str: string]: unknown
