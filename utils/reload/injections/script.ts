@@ -1,12 +1,12 @@
-import initReloadClient from "../initReloadClient";
+import initReloadClient from '../initReloadClient'
 
-export default function addHmrIntoScript(watchPath: string) {
+export default function addHmrIntoScript(watchPath: string | string[]) {
   initReloadClient({
     watchPath,
     onUpdate: () => {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      chrome.runtime.reload();
-    },
-  });
+      chrome.runtime.reload()
+    }
+  })
 }

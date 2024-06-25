@@ -36,7 +36,7 @@ function initReloadServer() {
 const debounceSrc = debounce(function (path: string) {
   // Normalize path on Windows
   const pathConverted = path.replace(/\\/g, '/')
-  console.log(`\n[HRS] Detected change in ${pathConverted}`)
+  console.log(`\n[HRS] Detected change in ${pathConverted}\n`)
   clientsThatNeedToUpdate.forEach((ws: WebSocket) =>
     ws.send(
       MessageInterpreter.send({
@@ -47,9 +47,7 @@ const debounceSrc = debounce(function (path: string) {
   )
   // Delay waiting for public assets to be copied
 }, 400)
-chokidar
-  .watch(['src', 'uno.config.ts'])
-  .on('all', (event, path) => debounceSrc(path))
+chokidar.watch('src').on('all', (event, path) => debounceSrc(path))
 
 /** CHECK:: build was completed **/
 const debounceDist = debounce(() => {

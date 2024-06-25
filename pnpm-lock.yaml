@@ -82,14 +82,17 @@ devDependencies:
   '@typescript-eslint/parser':
     specifier: 5.38.1
     version: 5.38.1(eslint@8.36.0)(typescript@4.9.5)
+  '@unocss/cli':
+    specifier: 0.55.7
+    version: 0.55.7(rollup@2.79.1)
   '@unocss/eslint-config':
-    specifier: ^0.55.7
+    specifier: 0.55.7
     version: 0.55.7(eslint@8.36.0)(typescript@4.9.5)
   '@unocss/preset-attributify':
-    specifier: ^0.55.7
+    specifier: 0.55.7
     version: 0.55.7
   '@unocss/transformer-attributify-jsx':
-    specifier: ^0.55.7
+    specifier: 0.55.7
     version: 0.55.7
   '@vitejs/plugin-react':
     specifier: 2.2.0
@@ -164,7 +167,7 @@ devDependencies:
     specifier: 4.9.5
     version: 4.9.5
   unocss:
-    specifier: ^0.55.7
+    specifier: 0.55.7
     version: 0.55.7(postcss@8.4.38)(rollup@2.79.1)(vite@3.1.3)
   unplugin-auto-import:
     specifier: ^0.16.6

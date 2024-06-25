@@ -405,6 +405,7 @@ const Newtab = () => {
         box-shadow-sample
         flex
         flex-col
+        justify-center
         items-center
         py-20px
         transition-all 
@@ -412,7 +413,7 @@ const Newtab = () => {
       '
       >
         <IMdiStarBoxOutline className='text-24px text-blue-300 cursor-pointer hover:text-blue-400 mb-30px' />
-        <IMdiClockCheckOutline className='text-24px text-[#3aa093] cursor-pointer hover:text-[#2dccb8]' />
+        <IMdiClockCheckOutline className='text-24px text-[#3aa09385] cursor-pointer hover:text-[#2dccb8]' />
       </div>
       <div
         className='

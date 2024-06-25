@@ -12,7 +12,7 @@ export default function watchRebuild(): PluginOption {
     async buildStart() {
       this.addWatchFile(manifestFile)
       this.addWatchFile(viteConfigFile)
-      this.addWatchFile(unoConfigFile)
+      // this.addWatchFile(unoConfigFile)
     }
   }
 }

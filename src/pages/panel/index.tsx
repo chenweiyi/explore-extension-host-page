@@ -4,7 +4,8 @@ import Panel from '@pages/panel/Panel'
 import '@pages/panel/index.css'
 import refreshOnUpdate from 'virtual:reload-on-update-in-view'
 // import { attachTwindStyle } from '@src/shared/style/twind'
-import 'virtual:uno.css'
+// import 'virtual:uno.css'
+import '@src/assets/style/uno.css'
 
 refreshOnUpdate('pages/panel')
 
