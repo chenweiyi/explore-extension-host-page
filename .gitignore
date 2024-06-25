@@ -19,4 +19,7 @@ public/manifest.json
 
 .eslintcache
 
+auto-imports.d.ts
+.eslintrc-auto-import.json
+
 *.zip
