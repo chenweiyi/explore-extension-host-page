@@ -57,11 +57,11 @@ const LeftMenu = (props: ILeftMenu) => {
             'mr-[12px]',
             'cursor-pointer',
             'hover:text-blue-500',
-            props.activeClass === '本地' ? 'text-blue-500 font-semibold' : ''
+            props.activeClass === 'local' ? 'text-blue-500 font-semibold' : ''
           ])}
           onClick={() => props.setActiveClass(Classes[0])}
         >
-          本地
+          {t('local')}
         </span>
         <span
           className={clsx([

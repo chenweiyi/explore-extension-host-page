@@ -74,7 +74,7 @@ const Newtab = () => {
         hover:box-shadow-sample-hover
       '
       >
-        <ATooltip title='书签' placement='right'>
+        <ATooltip title={t('type_tab')} placement='right'>
           <IMdiStarBoxOutline
             className={clsx(
               'text-24px',
@@ -87,7 +87,7 @@ const Newtab = () => {
             onClick={clickTab}
           />
         </ATooltip>
-        <ATooltip title='日历' placement='right'>
+        <ATooltip title={t('type_calendar')} placement='right'>
           <IMdiClockCheckOutline
             className={clsx(
               'text-24px',

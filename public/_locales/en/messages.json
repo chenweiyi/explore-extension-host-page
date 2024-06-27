@@ -1,0 +1,10 @@
+{
+  "type_tab": {
+    "message": "Bookmark",
+    "description": "Bookmark function description"
+  },
+  "type_calendar": {
+    "message": "Calendar",
+    "description": "Calendar function description"
+  }
+}

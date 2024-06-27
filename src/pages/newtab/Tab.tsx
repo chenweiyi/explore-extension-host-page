@@ -38,7 +38,7 @@ export interface IGithubTag {
 export type IGithubBookmarkMap = Map<IGithubTag, IGithubBookmark[]>
 
 export enum Classes {
-  本地,
+  local,
   github
 }
 

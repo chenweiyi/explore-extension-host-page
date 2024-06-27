@@ -1,0 +1,13 @@
+{
+  "type_tab": {
+    "message": "书签",
+    "description": "书签功能提示"
+  },
+  "type_calendar": {
+    "message": "日历",
+    "description": "日历功能提示"
+  },
+  "local": {
+    "message": "本地"
+  }
+}

@@ -8,6 +8,8 @@ const manifest: chrome.runtime.ManifestV3 = {
   name: packageJson.name,
   version: packageJson.version,
   description: packageJson.description,
+  author: 'chenweiyi',
+  default_locale: 'en',
   permissions: ['storage', 'bookmarks'],
   options_page: 'src/pages/options/index.html',
   background: {
