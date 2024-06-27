@@ -9,6 +9,7 @@ import {
   UPDATE_REQUEST_MESSAGE
 } from './constant'
 import MessageInterpreter from './interpreter'
+import log from '../log'
 
 const clientsThatNeedToUpdate: Set<WebSocket> = new Set()
 
@@ -16,10 +17,11 @@ function initReloadServer() {
   const wss = new WebSocketServer({ port: LOCAL_RELOAD_SOCKET_PORT })
 
   wss.on('listening', () =>
-    console.log(`[HRS] Server listening at ${LOCAL_RELOAD_SOCKET_URL}`)
+    log(`[HRS] Server listening at ${LOCAL_RELOAD_SOCKET_URL}`)
   )
 
   wss.on('connection', (ws) => {
+    log(`[HRS] Client connected`)
     clientsThatNeedToUpdate.add(ws)
 
     ws.addEventListener('close', () => clientsThatNeedToUpdate.delete(ws))
@@ -36,7 +38,7 @@ function initReloadServer() {
 const debounceSrc = debounce(function (path: string) {
   // Normalize path on Windows
   const pathConverted = path.replace(/\\/g, '/')
-  console.log(`\n[HRS] Detected change in ${pathConverted}\n`)
+  log(`[HRS] Detected change in ${pathConverted}`)
   clientsThatNeedToUpdate.forEach((ws: WebSocket) =>
     ws.send(
       MessageInterpreter.send({
@@ -47,22 +49,33 @@ const debounceSrc = debounce(function (path: string) {
   )
   // Delay waiting for public assets to be copied
 }, 400)
+
 chokidar.watch('src').on('all', (event, path) => debounceSrc(path))
 
 /** CHECK:: build was completed **/
 const debounceDist = debounce(() => {
+  log('dist change')
   clientsThatNeedToUpdate.forEach((ws: WebSocket) => {
-    ws.send(MessageInterpreter.send({ type: UPDATE_REQUEST_MESSAGE }))
+    ws.send(
+      MessageInterpreter.send({
+        type: UPDATE_REQUEST_MESSAGE
+      })
+    )
   })
-}, 100)
-chokidar.watch('dist').on('all', (event) => {
+}, 500)
+
+chokidar.watch('dist').on('all', (event, path, stats) => {
   // Ignore unlink, unlinkDir and change events
   // that happen in beginning of build:watch and
   // that will cause ws.send() if it takes more than 400ms
   // to build (which it might). This fixes:
   // https://github.com/Jonghakseo/chrome-extension-boilerplate-react-vite/issues/100
   if (event !== 'add' && event !== 'addDir') return
-  debounceDist()
+  // log(path, 'info')
+  // 监听是否产生构建的文件
+  if (path.includes('dist/src/pages')) {
+    debounceDist()
+  }
 })
 
 initReloadServer()

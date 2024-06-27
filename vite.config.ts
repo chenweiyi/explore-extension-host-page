@@ -26,6 +26,7 @@ const isProduction = !isDev
 // ENABLE HMR IN BACKGROUND SCRIPT
 const enableHmrInBackgroundScript = true
 
+console.log('isDev', isDev)
 export default defineConfig({
   resolve: {
     alias: {
@@ -40,6 +41,7 @@ export default defineConfig({
     UnoCSS(),
     AutoImport({
       dts: true,
+      dirs: ['./utils'],
       resolvers: [
         IconsResolver({
           prefix: 'i',
@@ -78,6 +80,11 @@ export default defineConfig({
   ],
   publicDir,
   build: {
+    watch: isDev
+      ? {
+          buildDelay: 2000
+        }
+      : null,
     outDir,
     /** Can slowDown build speed. */
     // sourcemap: isDev,

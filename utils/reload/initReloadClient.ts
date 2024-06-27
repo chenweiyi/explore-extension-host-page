@@ -5,6 +5,7 @@ import {
   UPDATE_REQUEST_MESSAGE
 } from './constant'
 import MessageInterpreter from './interpreter'
+import log from '../log'
 
 let needToUpdate = false
 
@@ -26,16 +27,18 @@ export default function initReloadClient({
 
     switch (message.type) {
       case UPDATE_REQUEST_MESSAGE: {
-        console.log('UPDATE_REQUEST_MESSAGE:', needToUpdate)
+        log(`UPDATE_REQUEST_MESSAGE: ${needToUpdate}`)
         if (needToUpdate) {
           sendUpdateCompleteMessage()
           needToUpdate = false
+          // setTimeout(() => {
           onUpdate()
+          // }, 2000)
         }
         return
       }
       case UPDATE_PENDING_MESSAGE: {
-        console.log('UPDATE_PENDING_MESSAGE:', needToUpdate)
+        log(`UPDATE_PENDING_MESSAGE:, ${needToUpdate}`)
         if (!needToUpdate) {
           if (typeof watchPath === 'string') {
             needToUpdate = message.path.includes(watchPath)
