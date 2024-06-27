@@ -6,5 +6,66 @@
   "type_calendar": {
     "message": "Calendar",
     "description": "Calendar function description"
+  },
+  "local": {
+    "message": "local"
+  },
+  "all": {
+    "message": "All"
+  },
+  "search_placeholder": {
+    "message": "Please Search"
+  },
+  "setting_title": {
+    "message": "Setting"
+  },
+  "setting_rememberSelectedCategory": {
+    "message": "Remember the selected category"
+  },
+  "setting_rememberSelectedFolder": {
+    "message": "Remember the selected Folder"
+  },
+  "setting_showOneWord": {
+    "message": "Show ONE_WORD"
+  },
+  "setting_excludeFolders": {
+    "message": "Exclude Folders"
+  },
+  "setting_excludeFoldersHint": {
+    "message": "multiple folders separated by commas"
+  },
+  "setting_githubTitle": {
+    "message": "Github"
+  },
+  "setting_githubOwner": {
+    "message": "Owner"
+  },
+  "setting_githubOwnerOrRepoHint": {
+    "message": "Example: $url$, where $detail$",
+    "placeholders": {
+      "url": {
+        "content": "$1",
+        "example": "https://github.com/{owner}/{repo}"
+      },
+      "detail": {
+        "content": "$2",
+        "example": "owner"
+      }
+    }
+  },
+  "setting_githubRepo": {
+    "message": "Repo"
+  },
+  "setting_githubConfigFilePath": {
+    "message": "Config File Path"
+  },
+  "setting_githubConfigFilePathHint": {
+    "message": "Configuration file location, for example: bookmark.json"
+  },
+  "setting_githubPersonalAccessToken": {
+    "message": "Personal Access Token"
+  },
+  "setting_githubPersonalAccessTokenHint": {
+    "message": "See the PAT settings under the address https://github.com/settings/apps"
   }
 }

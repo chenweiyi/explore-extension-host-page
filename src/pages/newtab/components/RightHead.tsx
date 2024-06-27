@@ -30,7 +30,7 @@ const RightHead = (props: IRightHead) => {
       <div className='search relative'>
         <input
           type='text'
-          placeholder='请搜索'
+          placeholder={t('search_placeholder')}
           className='
             h-[30px]
             w-[300px]

@@ -142,7 +142,7 @@ const Tab = () => {
       processBookmarkNodes(filterNodes)
       const allKey = {
         id: '-1',
-        title: '全部'
+        title: t('all')
       }
       const arr: ICategoryKey[] = []
       for (const val of mapRes.values()) {
@@ -206,7 +206,7 @@ const Tab = () => {
     }, [])
 
     folders.unshift({
-      title: '全部',
+      title: t('all'),
       id: '-1'
     })
 

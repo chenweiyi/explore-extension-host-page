@@ -9,5 +9,63 @@
   },
   "local": {
     "message": "本地"
+  },
+  "all": {
+    "message": "全部"
+  },
+  "search_placeholder": {
+    "message": "请搜索"
+  },
+  "setting_title": {
+    "message": "设置"
+  },
+  "setting_rememberSelectedCategory": {
+    "message": "记住选中的类别"
+  },
+  "setting_rememberSelectedFolder": {
+    "message": "记住选中的文件夹"
+  },
+  "setting_showOneWord": {
+    "message": "显示一句话"
+  },
+  "setting_excludeFolders": {
+    "message": "排除文件夹"
+  },
+  "setting_excludeFoldersHint": {
+    "message": "多个文件夹用逗号分隔"
+  },
+  "setting_githubTitle": {
+    "message": "Github"
+  },
+  "setting_githubOwner": {
+    "message": "拥有者（owner）"
+  },
+  "setting_githubOwnerOrRepoHint": {
+    "message": "例如: $url$, 其中的$detail$",
+    "placeholders": {
+      "url": {
+        "content": "$1",
+        "example": "https://github.com/{owner}/{repo}"
+      },
+      "detail": {
+        "content": "$2",
+        "example": "owner"
+      }
+    }
+  },
+  "setting_githubRepo": {
+    "message": "仓库名（repo）"
+  },
+  "setting_githubConfigFilePath": {
+    "message": "配置文件地址"
+  },
+  "setting_githubConfigFilePathHint": {
+    "message": "配置文件地址，例如: bookmark.json"
+  },
+  "setting_githubPersonalAccessToken": {
+    "message": "Personal Access Token"
+  },
+  "setting_githubPersonalAccessTokenHint": {
+    "message": "参见https://github.com/settings/apps地址下的PAT设置"
   }
 }

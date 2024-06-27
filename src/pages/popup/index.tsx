@@ -7,7 +7,7 @@ import refreshOnUpdate from 'virtual:reload-on-update-in-view'
 // import 'virtual:uno.css'
 import '@src/assets/style/uno.css'
 
-refreshOnUpdate('pages/popup')
+refreshOnUpdate(['pages/popup', 'uno.css'])
 
 function init() {
   const appContainer = document.querySelector('#app-container')

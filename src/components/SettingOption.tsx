@@ -75,10 +75,12 @@ const SettingOption: React.FC<IProps> = (props) => {
   return (
     <div className={clsx(['app p-[16px]', props.class ? props.class : ''])}>
       <div className='text-gray-600 text-[12px] mb-[16px]'>
-        <div className='title'>设置</div>
+        <div className='title'>{t('setting_title')}</div>
         <div className='content pl-[12px] pt-[12px]'>
           <label className='flex cursor-pointer select-none'>
-            <span className='mr-[8px]'>记住选中的类别：</span>
+            <span className='mr-[8px]'>
+              {t('setting_rememberSelectedCategory')}:
+            </span>
             <input
               type='checkbox'
               name='saveSelectClass'
@@ -89,7 +91,9 @@ const SettingOption: React.FC<IProps> = (props) => {
         </div>
         <div className='content pl-[12px] pt-[12px]'>
           <label className='flex cursor-pointer select-none'>
-            <span className='mr-[8px]'>记住选中的文件夹：</span>
+            <span className='mr-[8px]'>
+              {t('setting_rememberSelectedFolder')}:
+            </span>
             <input
               type='checkbox'
               name='saveSelectFolder'
@@ -100,7 +104,7 @@ const SettingOption: React.FC<IProps> = (props) => {
         </div>
         <div className='content pl-[12px] pt-[12px]'>
           <label className='flex cursor-pointer select-none'>
-            <span className='mr-[8px]'>显示一句话:</span>
+            <span className='mr-[8px]'>{t('setting_showOneWord')}:</span>
             <input
               type='checkbox'
               name='showOneWord'
@@ -111,11 +115,11 @@ const SettingOption: React.FC<IProps> = (props) => {
         </div>
         <div className='content pl-[12px] pt-[12px]'>
           <label className='flex items-center cursor-pointer select-none'>
-            <span className='mr-[8px]'>排除文件夹：</span>
+            <span className='mr-[8px]'>{t('setting_excludeFolders')}:</span>
             <input
               type='text'
               className='border-[1px] border-solid border-gray-500 rounded-[4px] p-[4px] flex-1'
-              placeholder='多个文件夹用逗号分隔'
+              placeholder={t('setting_excludeFoldersHint')}
               value={excludeFolders}
               onChange={(e) => setExcludeFolders(e.target.value)}
             />
@@ -123,44 +127,55 @@ const SettingOption: React.FC<IProps> = (props) => {
         </div>
       </div>
       <div className='text-gray-600 text-[12px] mb-[16px]'>
-        <div className='title'>Github</div>
+        <div className='title'>{t('setting_githubTitle')}</div>
         <div className='content pl-[12px] pt-[12px]'>
           <div className='mb-[8px] flex items-center'>
-            <span className='mr-[4px] w-[140px]'>拥有者（owner）:</span>
+            <span className='mr-[4px] w-[140px]'>
+              {t('setting_githubOwner')}:
+            </span>
             <input
               className='border-[1px] border-solid border-gray-500 rounded-[4px] p-[4px] flex-1 mr-[4px]'
               type='text'
-              placeholder='例如: https://github.com/{owner}/{repo}, 其中的owner'
+              placeholder={t('setting_githubOwnerOrRepoHint')}
               value={owner}
               onChange={(e) => setOwner(e.target.value)}
             />
           </div>
           <div className='mb-[8px] flex items-center'>
-            <span className='mr-[4px] w-[140px]'>仓库名（repo）:</span>
+            <span className='mr-[4px] w-[140px]'>
+              {t('setting_githubRepo')}:
+            </span>
             <input
               className='border-[1px] border-solid border-gray-500 rounded-[4px] p-[4px] flex-1 mr-[4px]'
               type='text'
-              placeholder='例如: https://github.com/{owner}/{repo}, 其中的repo'
+              placeholder={t('setting_githubOwnerOrRepoHint', [
+                'https://github.com/{owner}/{repo}',
+                'repo'
+              ])}
               value={repo}
               onChange={(e) => setRepo(e.target.value)}
             />
           </div>
           <div className='mb-[8px] flex items-center'>
-            <span className='mr-[4px] w-[140px]'>配置文件地址:</span>
+            <span className='mr-[4px] w-[140px]'>
+              {t('setting_githubConfigFilePath')}:
+            </span>
             <input
               className='border-[1px] border-solid border-gray-500 rounded-[4px] p-[4px] flex-1 mr-[4px]'
               type='text'
-              placeholder='配置文件地址，例如: bookmark.json'
+              placeholder={t('setting_githubConfigFilePathHint')}
               value={path}
               onChange={(e) => setPath(e.target.value)}
             />
           </div>
           <div className='mb-[8px] flex items-center'>
-            <span className='mr-[4px] w-[140px]'>Personal Access Token:</span>
+            <span className='mr-[4px] w-[140px]'>
+              {t('setting_githubPersonalAccessToken')}:
+            </span>
             <input
               className='border-[1px] border-solid border-gray-500 rounded-[4px] p-[4px] flex-1 mr-[4px]'
               type='text'
-              placeholder='参见https://github.com/settings/apps地址下的PAT设置'
+              placeholder={t('setting_githubPersonalAccessTokenHint')}
               value={authCode}
               onChange={(e) => setAuthCode(e.target.value)}
             />
