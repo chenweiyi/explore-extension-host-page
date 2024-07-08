@@ -9,15 +9,15 @@ type IChildTask = {
 
 type ITask = {
   name: string
-  color: string
+  color?: string
   startTime: Date
   endTime: Date
   level: number
   children?: Array<IChildTask>
 }
 
-const defaultColor = '#e9e9eb'
-const activeColor = '#fde2e2'
+const defaultColor = '#b3e19d'
+const activeColor = '#95d475'
 
 const tasks: ITask[] = [
   {
@@ -73,7 +73,14 @@ const tasks: ITask[] = [
     color: defaultColor,
     startTime: dayjs('2024-07-04').toDate(),
     endTime: dayjs('2024-07-07').toDate(),
-    level: 3
+    level: 2
+  },
+  {
+    name: 'task4',
+    color: defaultColor,
+    startTime: dayjs('2024-07-10').toDate(),
+    endTime: dayjs('2024-07-12').toDate(),
+    level: 0
   }
 ]
 
@@ -88,6 +95,9 @@ const Calendar = () => {
     const hoverLineStrokeColor = 'red'
     const hoverTickFillColor = 'red'
     const hoverTickFontSize = '12px'
+    const todayColor = 'rgba(243, 150, 17, 0.2)'
+
+    let taskLevels = [...new Set(tasks.map((t) => t.level + ''))]
 
     let hoverData: ITask | null = null
     let activeData: ITask | null = null
@@ -156,7 +166,7 @@ const Calendar = () => {
       g.append('line')
         .attr('class', 'dashed-line')
         .attr('x1', x(d.startTime))
-        .attr('y1', height - (i + 1) * (barHeight + barPadding))
+        .attr('y1', height - (d.level + 1) * (barHeight + barPadding))
         .attr('x2', x(d.startTime))
         .attr('y2', height)
         .style('stroke', hoverLineStrokeColor)
@@ -167,7 +177,7 @@ const Calendar = () => {
       g.append('line')
         .attr('class', 'dashed-line')
         .attr('x1', x(d.endTime))
-        .attr('y1', height - (i + 1) * (barHeight + barPadding))
+        .attr('y1', height - (d.level + 1) * (barHeight + barPadding))
         .attr('x2', x(d.endTime))
         .attr('y2', height)
         .style('stroke', hoverLineStrokeColor)
@@ -239,7 +249,7 @@ const Calendar = () => {
 
     function modifyBarAttr(barSelector, scaleX, transform) {
       barSelector
-        .attr('y', (d, i) => height - (i + 1) * (barHeight + barPadding))
+        .attr('y', (d, i) => height - (d.level + 1) * (barPadding + barHeight))
         .attr('x', (d) => scaleX(d.startTime))
         .attr('height', barHeight)
         .attr('width', (d) => scaleX(d.endTime) - scaleX(d.startTime))
@@ -264,7 +274,8 @@ const Calendar = () => {
         )
         .attr(
           'y',
-          (d, i) => height - (i + 1) * (barHeight + barPadding) - barHeight / 2
+          (d, i) =>
+            height - (d.level + 1) * (barHeight + barPadding) + barHeight / 2
         )
         .attr('text-anchor', 'middle')
         .text((d) => d.name)
@@ -294,6 +305,33 @@ const Calendar = () => {
         )
     }
 
+    function genYAxis(y, x, transform) {
+      const st = x.invert(0)
+      const et = x.invert(width)
+      const filterTasks: ITask[] = tasks.filter(
+        (t) => !(t.endTime < st || t.startTime > et)
+      )
+      // console.log('filterTasks:', filterTasks)
+      taskLevels = [...new Set(filterTasks.map((t) => t.level + ''))]
+      newYScale = d3
+        .scaleBand()
+        .rangeRound([
+          height - barHeight / 2,
+          height - taskLevels.length * (barHeight + barPadding) - barHeight / 2
+        ])
+        .domain(taskLevels.toSorted())
+      return d3
+        .axisLeft(newYScale)
+        .tickValues(filterTasks.map((t) => t.level + ''))
+        .tickFormat(function (val, index) {
+          console.log('val:', val)
+          return filterTasks
+            .filter((t) => t.level === +val)
+            .map((t) => t.name)
+            .join(',')
+        })
+    }
+
     /**
      * 绘制今天
      */
@@ -313,7 +351,7 @@ const Calendar = () => {
         .attr('y', 0)
         .attr('width', newXScale(todayEnd) - newXScale(todayStart))
         .attr('height', height)
-        .attr('fill', 'rgba(218, 239, 217, 0.4)')
+        .attr('fill', todayColor)
 
       g.selectAll('.today-text')
         .data([{ todayStart, todayEnd }])
@@ -340,14 +378,17 @@ const Calendar = () => {
     let newXScale = x
     const y = d3
       .scaleBand()
-      .range([
-        height,
-        height - tasks.length * ((barHeight / 2 + barPadding) * 2)
+      .rangeRound([
+        height - barHeight / 2,
+        height - taskLevels.length * (barHeight + barPadding) - barHeight / 2
       ])
-      .domain(tasks.map((d) => d.name))
+      .domain(taskLevels)
+    let newYScale = y
 
     console.log('0 -> time:', x.invert(0))
-    console.log('task[0] - value:', y(tasks[0].name))
+    console.log('end -> time:', x.invert(width))
+    console.log('task[0] - value:', y('0'))
+    console.log('task[1] - value:', y('1'))
 
     g.append('g')
       .attr('class', 'axis axis--x')
@@ -355,7 +396,23 @@ const Calendar = () => {
       // @ts-ignore
       .call(genXAxis(x, initialTransform))
 
-    g.append('g').attr('class', 'axis axis--y').call(d3.axisLeft(y))
+    g.append('g')
+      .attr('class', 'axis axis--y')
+      .attr('transform', `translate(0, 0)`)
+      // @ts-ignore
+      .call(genYAxis(y, x, initialTransform))
+
+    g.selectAll('.axis--y .tick text').each(function (d, i) {
+      const self = d3.select(this)
+      const text = self.text()
+      const split = text.split(',')
+      if (split.length > 1) {
+        self.text('')
+        split.forEach((t, i) => {
+          self.append('tspan').attr('x', '-10').attr('dy', `${i}em`).text(t)
+        })
+      }
+    })
 
     renderTodayRect()
 
@@ -409,13 +466,31 @@ const Calendar = () => {
     function zoomed(event) {
       newXScale = event.transform.rescaleX(x)
       newTransform = event.transform
-      console.log('transform:', newTransform)
+      // console.log('transform:', newTransform)
 
       // 更新x轴
       svg
         .select('.axis--x')
         // @ts-ignore
         .call(genXAxis(newXScale, newTransform))
+
+      // 更新y轴
+      svg
+        .select('.axis--y')
+        // @ts-ignore
+        .call(genYAxis(y, newXScale, newTransform))
+
+      g.selectAll('.axis--y .tick text').each(function (d, i) {
+        const self = d3.select(this)
+        const text = self.text()
+        const split = text.split(',')
+        if (split.length > 1) {
+          self.text('')
+          split.forEach((t, i) => {
+            self.append('tspan').attr('x', '-10').attr('dy', `${i}em`).text(t)
+          })
+        }
+      })
 
       renderTodayRect()
 
