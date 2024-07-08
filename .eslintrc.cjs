@@ -27,7 +27,8 @@ module.exports = {
   },
   rules: {
     'react/react-in-jsx-scope': 'off',
-    'react/jsx-no-undef': 'off'
+    'react/jsx-no-undef': 'off',
+    '@typescript-eslint/ban-ts-comment': 'warn'
   },
   globals: {
     chrome: 'readonly'
