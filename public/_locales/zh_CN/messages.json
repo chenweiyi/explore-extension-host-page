@@ -67,5 +67,8 @@
   },
   "setting_githubPersonalAccessTokenHint": {
     "message": "参见https://github.com/settings/apps地址下的PAT设置"
+  },
+  "common_placeholder": {
+    "message": "敬请期待"
   }
 }
