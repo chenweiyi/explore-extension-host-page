@@ -67,5 +67,8 @@
   },
   "setting_githubPersonalAccessTokenHint": {
     "message": "See the PAT settings under the address https://github.com/settings/apps"
+  },
+  "common_placeholder": {
+    "message": "Stay tuned"
   }
 }
