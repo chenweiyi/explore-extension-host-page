@@ -372,9 +372,10 @@ const Calendar = () => {
         .on('mouseout', function (e, d) {
           barMouseOutHandler.call(this, e, d, x, y, transform)
         })
-      // .on('click', function (e, d) {
-      //   barClickHandler.call(this, e, d, scaleX, scaleY, transform)
-      // })
+        .on('click', function (e, d) {
+          barClickHandler.call(this, e, d, x, y, transform)
+          activeData = d
+        })
     }
 
     function modifyBarGroupAttr(barGroupSelector, x, y, transform) {
@@ -460,7 +461,7 @@ const Calendar = () => {
         .domain(taskLevels.toSorted())
       return d3
         .axisLeft(newYScale)
-        .tickValues(filterTasks.map((t) => t.level + ''))
+        .tickValues(taskLevels)
         .tickFormat(function (val, index) {
           // console.log('val:', val)
           return filterTasks
@@ -796,7 +797,11 @@ const Calendar = () => {
   return (
     <div className='flex w-full h-full px-200px items-center justify-between'>
       <div className='calendar-container w-800px h-400px'>
-        <svg width='800' height='400' style={{ backgroundColor: '#fff' }}></svg>
+        <svg
+          width='800'
+          height='400'
+          style={{ backgroundColor: '#f4f4f5' }}
+        ></svg>
       </div>
       <div className='w-500px h-400px'>
         <ATabs items={tabItems} defaultActiveKey='doing'></ATabs>
