@@ -299,6 +299,7 @@ const primitiveNames = [
   'Col',
   'Comment',
   'ConfigProvider',
+  'ColorPicker',
   'DatePicker',
   'MonthPicker',
   'WeekPicker',

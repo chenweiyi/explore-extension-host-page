@@ -1,5 +1,4 @@
 import * as d3 from 'd3'
-import { Ref } from 'react'
 
 export type IStatus = Array<
   'doing' | 'parallel' | 'coming-soon' | 'expiring-soon' | 'delay' | 'done'
@@ -23,6 +22,8 @@ export type ITask = {
   endTime: Date
   level: number
   status: IStatus
+  link?: string
+  desc?: string
   children?: Array<IChildTask>
 }
 
@@ -428,11 +429,17 @@ const Gantt = (props: IGanttProps, ref) => {
       // @ts-ignore
       .call(genXAxis(x, initialTransform))
 
-    g.append('g')
+    const yAxis = g
+      .append('g')
       .attr('class', 'axis axis--y')
       .attr('transform', `translate(0, 0)`)
+
+    if (tasks.length > 0) {
       // @ts-ignore
-      .call(genYAxis(tasks, taskLevels))
+      yAxis.style('display', 'block').call(genYAxis(tasks, taskLevels))
+    } else {
+      yAxis.style('display', 'none')
+    }
 
     g.selectAll('.axis--y .tick text').each(function (d, i) {
       const self = d3.select(this)
@@ -525,11 +532,16 @@ const Gantt = (props: IGanttProps, ref) => {
         // @ts-ignore
         .call(genXAxis(newXScale, newTransform))
 
-      // 更新y轴
-      svg
-        .select('.axis--y')
-        // @ts-ignore
-        .call(genYAxis(filterTasks, taskLevels))
+      if (filterTasks.length > 0) {
+        // 更新y轴
+        svg
+          .select('.axis--y')
+          .style('display', 'block')
+          // @ts-ignore
+          .call(genYAxis(filterTasks, taskLevels))
+      } else {
+        svg.select('.axis--y').style('display', 'none')
+      }
 
       g.selectAll('.axis--y .tick text').each(function (d, i) {
         const self = d3.select(this)

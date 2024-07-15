@@ -5,3 +5,7 @@ export const t = (...args) => {
   console.log(args[0], res)
   return res
 }
+
+export const getLanguage = () => {
+  return chrome.i18n.getUILanguage()
+}
