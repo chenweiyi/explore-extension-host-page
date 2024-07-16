@@ -21,7 +21,7 @@ const Toolbox = (props: IToolboxProps) => {
           onClick={() => props.setShowType('add')}
         />
       </ATooltip>
-      <ATooltip title='分析统计' placement='right'>
+      <ATooltip title='分析统计' placement='right' className='mb-20px'>
         <StockOutlined
           className={clsx(
             'text-20px transition cursor-pointer hover:text-yellow-500 hover:scale-110',
@@ -31,6 +31,18 @@ const Toolbox = (props: IToolboxProps) => {
             }
           )}
           onClick={() => props.setShowType('analysis')}
+        />
+      </ATooltip>
+      <ATooltip title='刷新重置' placement='right' className='mb-20px'>
+        <SyncOutlined
+          className={clsx(
+            'text-20px transition cursor-pointer hover:text-green-500 hover:scale-110',
+            {
+              'text-green-500': props.showType === 'refresh',
+              'font-semibold': props.showType === 'refresh'
+            }
+          )}
+          onClick={() => props.setShowType('refresh')}
         />
       </ATooltip>
     </div>

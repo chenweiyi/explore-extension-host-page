@@ -1,7 +1,14 @@
 import * as d3 from 'd3'
 
 export type IStatus = Array<
-  'doing' | 'parallel' | 'coming-soon' | 'expiring-soon' | 'delay' | 'done'
+  | 'doing'
+  | 'blocking'
+  | 'coming-soon'
+  | 'unstart'
+  | 'expiring-soon'
+  | 'expired'
+  | 'delay'
+  | 'done'
 >
 export type IChildTaskType = 'start' | 'block' | 'area' | 'end'
 
@@ -22,6 +29,7 @@ export type ITask = {
   endTime: Date
   level: number
   status: IStatus
+  parallelTimes: string[]
   link?: string
   desc?: string
   children?: Array<IChildTask>
@@ -29,10 +37,15 @@ export type ITask = {
 
 export type IGanttProps = {
   tasks: ITask[]
+  width: number
+  height: number
+  startTime?: Date
+  endTime?: Date
   onSvgDblClick?: () => void
 }
 
 const Gantt = (props: IGanttProps, ref) => {
+  const svgBgColor = '#f4f4f5'
   const barHeight = 30
   const barPadding = 30
   const offsetDate = 2
@@ -63,7 +76,8 @@ const Gantt = (props: IGanttProps, ref) => {
     return 6
   }
 
-  function renderChart(tasks: ITask[]) {
+  function renderChart(props: IGanttProps) {
+    const { tasks, startTime, endTime, onSvgDblClick } = props
     let hoverData: ITask | IChildTask | null = null
     let activeData: ITask | null = null
     let restoreData: ITask | null = null
@@ -72,23 +86,30 @@ const Gantt = (props: IGanttProps, ref) => {
     let newYScale
     let newTransform
     let taskLevels = [...new Set(tasks.map((t) => t.level + ''))]
-    const startTime = dayjs(d3.min(tasks, (t) => t.startTime))
-      .subtract(offsetDate, 'day')
-      .toDate()
-    const endTime = dayjs(d3.max(tasks, (t) => t.endTime))
-      .add(offsetDate, 'day')
-      .toDate()
+    // const startTime = dayjs(d3.min(tasks, (t) => t.startTime))
+    //   .subtract(offsetDate, 'day')
+    //   .toDate()
+    // const endTime = dayjs(d3.max(tasks, (t) => t.endTime))
+    //   .add(offsetDate, 'day')
+    //   .toDate()
 
-    const svg = d3.select('.calendar-container svg')
+    d3.select('.calendar-container .gantt-container').remove()
+    const svg = d3
+      .select('.calendar-container')
+      .append('svg')
+      .attr('class', 'gantt-container')
+      .attr('width', props.width)
+      .attr('height', props.height)
+      .style('background-color', svgBgColor)
     const width = +svg.attr('width') - margin.left - margin.right
     const height = +svg.attr('height') - margin.top - margin.bottom
 
-    const minTime = dayjs(d3.min(tasks, (t) => t.startTime))
-      .subtract(offsetDate, 'day')
-      .toDate()
-    const maxTime = dayjs(d3.max(tasks, (t) => t.endTime))
-      .add(offsetDate, 'day')
-      .toDate()
+    // const minTime = dayjs(d3.min(tasks, (t) => t.startTime))
+    //   .subtract(offsetDate, 'day')
+    //   .toDate()
+    // const maxTime = dayjs(d3.max(tasks, (t) => t.endTime))
+    //   .add(offsetDate, 'day')
+    //   .toDate()
 
     function genTransform(st, et) {
       return d3.zoomIdentity
@@ -102,7 +123,7 @@ const Gantt = (props: IGanttProps, ref) => {
       .domain([startTime, endTime])
       .rangeRound([0, width])
 
-    const initialTransform = genTransform(minTime, maxTime)
+    const initialTransform = genTransform(startTime, endTime)
     newTransform = initialTransform
 
     console.log('initialTransform:', initialTransform)
@@ -277,7 +298,7 @@ const Gantt = (props: IGanttProps, ref) => {
         .attr('y', (d, i) => y(d.level + '') + barHeight / 2)
         .attr('x', (d) => {
           if (d.children?.length) {
-            return x(d.startTime)
+            return x(d.children[0].startTime)
           } else {
             return x(d.startTime)
           }
@@ -352,7 +373,7 @@ const Gantt = (props: IGanttProps, ref) => {
           height - barHeight / 2,
           height - taskLevels.length * (barHeight + barPadding) - barHeight / 2
         ])
-        .domain(taskLevels.toSorted())
+        .domain(sortBy(taskLevels, (t) => +t))
       return d3
         .axisLeft(newYScale)
         .tickValues(taskLevels)
@@ -508,12 +529,9 @@ const Gantt = (props: IGanttProps, ref) => {
       }
     }
 
-    function zoomed(event) {
-      newXScale = event.transform.rescaleX(x)
-      newTransform = event.transform
-      // console.log('transform:', newTransform)
-      const st = newXScale.invert(0)
-      const et = newXScale.invert(width)
+    function getFilterTasks(x, tasks: ITask[]) {
+      const st = x.invert(0)
+      const et = x.invert(width)
       const filterTasks: ITask[] = tasks.filter((t) => {
         if (!t.children || t.children.length === 0) {
           return !(t.endTime < st || t.startTime > et)
@@ -525,6 +543,18 @@ const Gantt = (props: IGanttProps, ref) => {
         }
       })
       taskLevels = [...new Set(filterTasks.map((t) => t.level + ''))]
+      return {
+        filterTasks,
+        taskLevels
+      }
+    }
+
+    function zoomed(event) {
+      newXScale = event.transform.rescaleX(x)
+      newTransform = event.transform
+      // console.log('transform:', newTransform)
+
+      const { filterTasks, taskLevels } = getFilterTasks(newXScale, tasks)
 
       // 更新x轴
       svg
@@ -593,7 +623,7 @@ const Gantt = (props: IGanttProps, ref) => {
       .call(zoom)
       .on('dblclick.zoom', () => {
         // setShowType('')
-        props.onSvgDblClick?.()
+        onSvgDblClick?.()
       })
       // @ts-ignore
       .call(zoom.transform, initialTransform)
@@ -630,7 +660,8 @@ const Gantt = (props: IGanttProps, ref) => {
     }
 
     return {
-      jumpToTask
+      jumpToTask,
+      refresh: (data = {}) => renderChart({ ...props, ...data })
     }
   }
 
@@ -639,13 +670,18 @@ const Gantt = (props: IGanttProps, ref) => {
   }))
 
   useEffect(() => {
-    console.log('gantt init')
-    setPower(renderChart(props.tasks || []))
+    console.log('-- gantt init --')
+    setPower(
+      renderChart({
+        ...props,
+        startTime:
+          props.startTime || dayjs().subtract(7, 'day').startOf('day').toDate(),
+        endTime: props.endTime || dayjs().add(7, 'day').startOf('day').toDate()
+      })
+    )
   }, [])
 
-  return (
-    <svg width='800' height='400' style={{ backgroundColor: '#f4f4f5' }}></svg>
-  )
+  return <svg className='gantt-container'></svg>
 }
 
 export default forwardRef(Gantt)

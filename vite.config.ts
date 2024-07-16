@@ -58,7 +58,7 @@ export default defineConfig({
         'react',
         'ahooks',
         {
-          'lodash-es': ['isNil'],
+          'lodash-es': ['isNil', 'sortBy'],
           clsx: [['default', 'clsx']],
           dayjs: [['default', 'dayjs']],
           axios: [['default', 'axios']]

@@ -1,14 +1,18 @@
 import withSuspense from '@src/shared/hoc/withSuspense'
 import { IOriTask } from '../Calendar'
+import { Form } from 'antd'
 
 type IAddTaskProps = {
-  allTasks: IOriTask[]
-  addTask: (tasks: IOriTask) => void
+  addTask: (tasks: IOriTask) => boolean
 }
+
+const dateFormat = 'YYYY-MM-DD'
 
 const AddTask = (props: IAddTaskProps) => {
   const [startTime, setStartTime] = useState('')
   const [endTime, setEndTime] = useState('')
+  const [parallelTimes, setParallelTimes] = useState<string[]>([])
+  const [form] = Form.useForm()
 
   const rules = {
     name: [
@@ -16,55 +20,57 @@ const AddTask = (props: IAddTaskProps) => {
         required: true,
         message: '请输入任务名称',
         trigger: 'blur'
-      },
-      {
-        validator: (_, value, callback) => {
-          if (props.allTasks.find((t) => t.name === value)) {
-            callback('任务名称重复')
-          } else {
-            callback()
-          }
-        },
-        trigger: 'blur'
       }
     ],
     timescope: [
       {
         required: true,
         message: '请选择任务周期'
+      },
+      {
+        validator: (rule, value, callback) => {
+          if (dayjs(value[0]).isSame(dayjs(value[1]))) {
+            callback('开始时间需小于结束时间')
+            return
+          }
+          callback()
+        },
+        trigger: 'change'
       }
     ]
   }
 
-  const onTimeScopeChange = (dates: any) => {
-    if (dates) {
-      const startTime = dates[0]
-      const endTime = dates[1].endOf('day') // endTime被设置为该日期的最后一秒
+  const onChangeRange = (dates: any) => {
+    setStartTime(dayjs(dates[0]).format(dateFormat))
+    setEndTime(dayjs(dates[1]).format(dateFormat))
+  }
 
-      console.log(
-        startTime.format('YYYY-MM-DD HH:mm:ss'),
-        endTime.format('YYYY-MM-DD HH:mm:ss')
-      )
-      setStartTime(startTime.format('YYYY-MM-DD HH:mm:ss'))
-      setEndTime(endTime.format('YYYY-MM-DD HH:mm:ss'))
-    }
+  const onChangeParallelTimes = (dates: any) => {
+    setParallelTimes(dates.map((d) => dayjs(d).format(dateFormat)))
   }
 
   const onFinish = (value: any) => {
     console.log(value)
-    props.addTask({
+    const options = {
       name: value.name,
       color: value.color,
-      startTime: dayjs(startTime).toDate(),
-      endTime: dayjs(endTime).toDate(),
+      startTime: dayjs(value.timescope[0]).format(dateFormat),
+      endTime: dayjs(value.timescope[1]).format(dateFormat),
       link: value.link,
-      desc: value.desc
-    })
+      desc: value.desc,
+      parallelTimes: parallelTimes
+    }
+    console.log('options:', options)
+    const res = props.addTask(options)
+    if (res) {
+      form.resetFields()
+    }
   }
 
   return (
     <div className='w-500px h-400px'>
       <AForm
+        form={form}
         name='addTask'
         labelCol={{ span: 5 }}
         labelAlign='left'
@@ -76,7 +82,14 @@ const AddTask = (props: IAddTaskProps) => {
         <AForm.Item label='任务周期：' name='timescope' rules={rules.timescope}>
           <ADatePicker.RangePicker
             format='YYYY-MM-DD'
-            onChange={onTimeScopeChange}
+            onChange={onChangeRange}
+          />
+        </AForm.Item>
+        <AForm.Item label='支持并行时间：' name='parallelTimes'>
+          <ADatePicker
+            multiple
+            format='YYYY-MM-DD'
+            onChange={onChangeParallelTimes}
           />
         </AForm.Item>
         <AForm.Item label='任务颜色：' name='color'>

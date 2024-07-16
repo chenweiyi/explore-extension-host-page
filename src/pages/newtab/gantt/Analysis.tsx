@@ -44,11 +44,11 @@ const Analysis = (props: IAnalysisProps) => {
       )
     },
     {
-      key: 'parallel',
-      label: '并行中',
+      key: 'blocking',
+      label: '阻塞中',
       children: (
         <TaskList
-          tasks={props.tasks.filter((t) => t.status.includes('parallel'))}
+          tasks={props.tasks.filter((t) => t.status.includes('blocking'))}
           clickTask={props.clickTask}
         />
       )
@@ -69,6 +69,26 @@ const Analysis = (props: IAnalysisProps) => {
       children: (
         <TaskList
           tasks={props.tasks.filter((t) => t.status.includes('expiring-soon'))}
+          clickTask={props.clickTask}
+        />
+      )
+    },
+    {
+      key: 'expired',
+      label: '已过期',
+      children: (
+        <TaskList
+          tasks={props.tasks.filter((t) => t.status.includes('expired'))}
+          clickTask={props.clickTask}
+        />
+      )
+    },
+    {
+      key: 'unstart',
+      label: '未开始',
+      children: (
+        <TaskList
+          tasks={props.tasks.filter((t) => t.status.includes('unstart'))}
           clickTask={props.clickTask}
         />
       )
@@ -101,7 +121,11 @@ const Analysis = (props: IAnalysisProps) => {
 
   return (
     <div className='w-500px h-400px'>
-      <ATabs items={tabItems} defaultActiveKey='doing'></ATabs>
+      <ATabs
+        items={tabItems}
+        defaultActiveKey='doing'
+        tabPosition='left'
+      ></ATabs>
     </div>
   )
 }
