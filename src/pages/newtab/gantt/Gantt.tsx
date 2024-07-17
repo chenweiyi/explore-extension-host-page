@@ -1,4 +1,5 @@
 import * as d3 from 'd3'
+import { simpleCopy } from './util'
 
 export type IStatus = Array<
   | 'doing'
@@ -15,18 +16,23 @@ export type IChildTaskType = 'start' | 'block' | 'area' | 'end'
 export type IChildTask = {
   name: string
   color: string
-  startTime: Date
-  endTime: Date
+  startTime: string
+  endTime: string
   level: number
   type: IChildTaskType
   pid: string
 }
 
+export type IChildTask2 = Omit<IChildTask, 'startTime' | 'endTime'> & {
+  startTime: Date
+  endTime: Date
+}
+
 export type ITask = {
   name: string
   color: string
-  startTime: Date
-  endTime: Date
+  startTime: string
+  endTime: string
   level: number
   status: IStatus
   parallelTimes: string[]
@@ -35,12 +41,18 @@ export type ITask = {
   children?: Array<IChildTask>
 }
 
+export type ITask2 = Omit<ITask, 'children' | 'startTime' | 'endTime'> & {
+  startTime: Date
+  endTime: Date
+  children?: Array<IChildTask2>
+}
+
 export type IGanttProps = {
   tasks: ITask[]
   width: number
   height: number
-  startTime?: Date
-  endTime?: Date
+  startTime?: string
+  endTime?: string
   onSvgDblClick?: () => void
 }
 
@@ -76,15 +88,39 @@ const Gantt = (props: IGanttProps, ref) => {
     return 6
   }
 
+  function transformTasks(tasks: ITask[]): ITask2[] {
+    const target: Array<ITask2> = simpleCopy(tasks)
+    for (let i = 0; i < target.length; i++) {
+      const task = target[i]
+      task.startTime = dayjs(task.startTime).toDate()
+      task.endTime = dayjs(task.endTime).toDate()
+      if (task.children?.length) {
+        task.children.forEach((c) => {
+          c.startTime = dayjs(c.startTime).toDate()
+          c.endTime = dayjs(c.endTime).toDate()
+        })
+      }
+    }
+    return target
+  }
+
   function renderChart(props: IGanttProps) {
-    const { tasks, startTime, endTime, onSvgDblClick } = props
-    let hoverData: ITask | IChildTask | null = null
-    let activeData: ITask | null = null
-    let restoreData: ITask | null = null
+    const {
+      tasks: _tasks,
+      startTime: _startTime,
+      endTime: _endTime,
+      onSvgDblClick
+    } = props
+    let hoverData: ITask2 | IChildTask2 | null = null
+    let activeData: ITask2 | null = null
+    let restoreData: ITask2 | null = null
     let zooming = false
     let newXScale
     let newYScale
     let newTransform
+    const tasks = transformTasks(_tasks)
+    const startTime = dayjs(_startTime).toDate()
+    const endTime = dayjs(_endTime).toDate()
     let taskLevels = [...new Set(tasks.map((t) => t.level + ''))]
     // const startTime = dayjs(d3.min(tasks, (t) => t.startTime))
     //   .subtract(offsetDate, 'day')
@@ -131,15 +167,15 @@ const Gantt = (props: IGanttProps, ref) => {
     /**
      * 高亮柱子
      */
-    function highlightBar(d: ITask | IChildTask, x, y, transform) {
+    function highlightBar(d: ITask2 | IChildTask2, x, y, transform) {
       if (d.name === activeData?.name) return
       let st, et
       if (Object.prototype.hasOwnProperty.call(d, 'pid')) {
-        d3.selectAll('.bar-group').each(function (_d: ITask, i) {
-          if (_d.name === (d as IChildTask).pid) {
+        d3.selectAll('.bar-group').each(function (_d: ITask2, i) {
+          if (_d.name === (d as IChildTask2).pid) {
             d3.select(this)
               .selectAll('.bar')
-              .each(function (_d: ITask | IChildTask, i) {
+              .each(function (_d: ITask2 | IChildTask2, i) {
                 if (_d.name === d.name) {
                   d3.select(this)
                     .style('stroke', hoverBarStrokeColor)
@@ -148,22 +184,22 @@ const Gantt = (props: IGanttProps, ref) => {
               })
           }
         })
-        st = (d as IChildTask).startTime
-        et = (d as IChildTask).endTime
+        st = (d as IChildTask2).startTime
+        et = (d as IChildTask2).endTime
       } else {
-        d3.selectAll('.bar-group').each(function (_d: ITask, i) {
+        d3.selectAll('.bar-group').each(function (_d: ITask2, i) {
           if (_d.name === d.name) {
             d3.select(this)
               .style('stroke', hoverBarStrokeColor)
               .style('stroke-width', '1px')
           }
         })
-        st = (d as ITask).children?.length
-          ? (d as ITask).children[0].startTime
-          : (d as ITask).startTime
-        et = (d as ITask).children?.length
-          ? (d as ITask).children[(d as ITask).children.length - 1].endTime
-          : (d as ITask).endTime
+        st = (d as ITask2).children?.length
+          ? (d as ITask2).children[0].startTime
+          : (d as ITask2).startTime
+        et = (d as ITask2).children?.length
+          ? (d as ITask2).children[(d as ITask2).children.length - 1].endTime
+          : (d as ITask2).endTime
       }
 
       // 添加左侧虚线
@@ -200,15 +236,15 @@ const Gantt = (props: IGanttProps, ref) => {
     /**
      * 清除柱子的高亮样式
      */
-    function clearHighlightBar(d: ITask | IChildTask, x, y, transform) {
+    function clearHighlightBar(d: ITask2 | IChildTask2, x, y, transform) {
       if (!d) return
       let st, et
       if (Object.prototype.hasOwnProperty.call(d, 'pid')) {
-        d3.selectAll('.bar-group').each(function (_d: ITask, i) {
-          if (_d.name === (d as IChildTask).pid) {
+        d3.selectAll('.bar-group').each(function (_d: ITask2, i) {
+          if (_d.name === (d as IChildTask2).pid) {
             d3.select(this)
               .selectAll('.bar')
-              .each(function (_d: ITask | IChildTask, i) {
+              .each(function (_d: ITask2 | IChildTask2, i) {
                 if (_d.name === d.name) {
                   d3.select(this).style('stroke', 'inherit')
                   d3.select(this).style('stroke-width', 'inherit')
@@ -216,24 +252,24 @@ const Gantt = (props: IGanttProps, ref) => {
               })
           }
         })
-        st = (d as IChildTask).startTime
-        et = (d as IChildTask).endTime
+        st = (d as IChildTask2).startTime
+        et = (d as IChildTask2).endTime
       } else {
-        d3.selectAll('.bar-group').each(function (_d: ITask, i) {
+        d3.selectAll('.bar-group').each(function (_d: ITask2, i) {
           if (_d.name === d.name) {
             d3.select(this).style('stroke', 'none')
           }
         })
-        st = (d as ITask).children?.length
-          ? (d as ITask).children[0].startTime
-          : (d as ITask).startTime
-        et = (d as ITask).children?.length
-          ? (d as ITask).children[(d as ITask).children.length - 1].endTime
-          : (d as ITask).endTime
+        st = (d as ITask2).children?.length
+          ? (d as ITask2).children[0].startTime
+          : (d as ITask2).startTime
+        et = (d as ITask2).children?.length
+          ? (d as ITask2).children[(d as ITask2).children.length - 1].endTime
+          : (d as ITask2).endTime
       }
 
       g.selectAll('.dashed-line')
-        .filter((_d: ITask) => _d.name === d.name)
+        .filter((_d: ITask2) => _d.name === d.name)
         .remove()
 
       // 还原x轴标签样式
@@ -366,7 +402,7 @@ const Gantt = (props: IGanttProps, ref) => {
         )
     }
 
-    function genYAxis(filterTasks: ITask[], taskLevels: string[]) {
+    function genYAxis(filterTasks: ITask2[], taskLevels: string[]) {
       newYScale = d3
         .scaleBand()
         .rangeRound([
@@ -529,10 +565,10 @@ const Gantt = (props: IGanttProps, ref) => {
       }
     }
 
-    function getFilterTasks(x, tasks: ITask[]) {
+    function getFilterTasks(x, tasks: ITask2[]) {
       const st = x.invert(0)
       const et = x.invert(width)
-      const filterTasks: ITask[] = tasks.filter((t) => {
+      const filterTasks: ITask2[] = tasks.filter((t) => {
         if (!t.children || t.children.length === 0) {
           return !(t.endTime < st || t.startTime > et)
         } else {
@@ -594,7 +630,7 @@ const Gantt = (props: IGanttProps, ref) => {
       // 绘制柱状图
       const barGroup = g
         .selectAll('.bar-group')
-        .data(filterTasks, (d: ITask) => d.name)
+        .data(filterTasks, (d: ITask2) => d.name)
 
       barGroup.exit().remove()
 
@@ -628,7 +664,7 @@ const Gantt = (props: IGanttProps, ref) => {
       // @ts-ignore
       .call(zoom.transform, initialTransform)
 
-    function jumpToTask(t: ITask) {
+    function jumpToTask(t: ITask2) {
       if (activeData?.name === t.name) {
         // 如果是同一个柱子，则还原transform
         // @ts-ignore

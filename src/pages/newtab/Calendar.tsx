@@ -1,5 +1,5 @@
 import withSuspense from '@src/shared/hoc/withSuspense'
-import Gantt, { IChildTask, IStatus, ITask } from './gantt/Gantt'
+import Gantt, { IChildTask, IStatus, ITask, ITask2 } from './gantt/Gantt'
 import Toolbox from './gantt/Toolbox'
 import AddTask from './gantt/AddTask'
 import Analysis from './gantt/Analysis'
@@ -18,13 +18,10 @@ import {
 
 export type IShowType = '' | 'add' | 'analysis' | 'refresh'
 export type IOriTask = Omit<ITask, 'children' | 'level' | 'status'> & {
-  startTime: string
-  endTime: string
   color?: string
   link?: string
   desc?: string
 }
-const dateFormat = 'YYYY-MM-DD'
 
 export type IGenChildTask = IOriTask & {
   startTime: string
@@ -38,27 +35,7 @@ export type IGenChildTask = IOriTask & {
   >
 }
 
-export type IGenLevelTask = Omit<ITask, 'status' | 'children'> & {
-  startTime: string
-  endTime: string
-  children?: Array<
-    Omit<IChildTask, 'startTime' | 'endTime'> & {
-      startTime: string
-      endTime: string
-    }
-  >
-}
-
-export type IGenStatusTask = Omit<ITask, 'children'> & {
-  startTime: string
-  endTime: string
-  children?: Array<
-    Omit<IChildTask, 'startTime' | 'endTime'> & {
-      startTime: string
-      endTime: string
-    }
-  >
-}
+export type IGenLevelTask = Omit<ITask, 'status'>
 
 export const colors = [
   '#5B8FF9',
@@ -74,6 +51,8 @@ export const colors = [
 const activeColor = '#95d475'
 const defaultColor = '#FD6585'
 const defaultBlockColor = '#e9e9eb'
+const dateFormat = 'YYYY-MM-DD'
+const STORAGE_GANTT_KEY = 'gantt-tasks'
 
 const Calendar = () => {
   const [svgWidth, setSvgWidth] = useState(800)
@@ -306,8 +285,8 @@ const Calendar = () => {
     return target
   }
 
-  function genTasksStatus(tasks: Array<IGenLevelTask>): Array<IGenStatusTask> {
-    const target: Array<IGenStatusTask> = simpleCopy(tasks)
+  function genTasksStatus(tasks: Array<IGenLevelTask>): Array<ITask> {
+    const target: Array<ITask> = simpleCopy(tasks)
     for (let i = 0; i < target.length; i++) {
       const task = target[i]
       const min = task.children?.length
@@ -343,27 +322,10 @@ const Calendar = () => {
     return target
   }
 
-  function genTask(tasks: Array<IGenStatusTask>): ITask[] {
-    const target: Array<ITask> = simpleCopy(tasks)
-    for (let i = 0; i < target.length; i++) {
-      const task = target[i]
-      task.startTime = dayjs(task.startTime).toDate()
-      task.endTime = dayjs(task.endTime).toDate()
-      if (task.children?.length) {
-        task.children.forEach((c) => {
-          c.startTime = dayjs(c.startTime).toDate()
-          c.endTime = dayjs(c.endTime).toDate()
-        })
-      }
-    }
-    return target
-  }
-
-  function regenTasks(oriTasks: IOriTask[]) {
+  function regenTasks(oriTasks: IOriTask[]): ITask[] {
     let tasks1: Array<IGenChildTask> = []
     let tasks2: Array<IGenLevelTask> = []
-    let tasks3: Array<IGenStatusTask> = []
-    let tasks: ITask[] = []
+    let tasks3: Array<ITask> = []
     const sortTasks: Array<IOriTask> = sortBy(oriTasks, [
       'startTime',
       'endTime'
@@ -375,15 +337,15 @@ const Calendar = () => {
     console.log('levelTasks:', tasks2)
     tasks3 = genTasksStatus(tasks2)
     console.log('statusTasks:', tasks3)
-    tasks = genTask(tasks3)
-    console.log('tasks:', tasks)
-
-    return tasks
+    return tasks3
   }
 
-  useEffect(() => {
-    console.log('---- oriTasks change ----')
-    const tasks = regenTasks([...oriTasks])
+  useUpdateEffect(() => {
+    console.log('---- oriTasks change ----', oriTasks)
+    chrome.storage.sync.set({
+      [STORAGE_GANTT_KEY]: JSON.stringify(oriTasks)
+    })
+    const tasks: ITask[] = regenTasks([...oriTasks])
     setTasks(tasks)
     ganttRef.current?.refresh?.({
       tasks
@@ -396,6 +358,16 @@ const Calendar = () => {
       setShowType('')
     }
   }, [showType])
+
+  useEffect(() => {
+    console.log('calendar init...')
+    chrome.storage.sync.get([STORAGE_GANTT_KEY], (result) => {
+      const oriTasks = result[STORAGE_GANTT_KEY]
+      if (oriTasks) {
+        setOriTasks(JSON.parse(oriTasks))
+      }
+    })
+  }, [])
 
   return (
     <div className='flex flex-wrap w-full h-full pl-120px pr-40px items-center justify-center'>
