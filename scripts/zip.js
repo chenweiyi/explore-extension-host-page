@@ -39,7 +39,7 @@ const packageData = readPackageVersion()
 const folderPath = path.join(__dirname, '../dist')
 const zipPath = path.join(
   __dirname,
-  `../explore-extension-host-page_v${packageData.version}.zip`
+  `../.output/explore-extension-host-page_v${packageData.version}.zip`
 )
 
 zipFolder(folderPath, zipPath)

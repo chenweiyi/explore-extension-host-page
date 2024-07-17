@@ -17,6 +17,7 @@
     "wss": "node utils/reload/initReloadServer.js",
     "unocss": "unocss -w",
     "build:once": "cross-env __DEV__=true vite build",
+    "build:simple": "vite build",
     "dev": "npm run build:hmr && (run-p wss build:dev unocss)",
     "dev:firefox": "npm run build:hmr && (run-p wss build:firefox:watch)",
     "test": "jest",
