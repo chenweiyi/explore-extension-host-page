@@ -127,6 +127,8 @@
     "AConfigProvider": true,
     "sortBy": true,
     "ASwitch": true,
-    "SyncOutlined": true
+    "SyncOutlined": true,
+    "DeleteOutlined": true,
+    "ExclamationCircleOutlined": true
   }
 }

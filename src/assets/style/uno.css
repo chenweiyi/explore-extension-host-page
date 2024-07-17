@@ -164,6 +164,7 @@
 .hover\:text-blue-500:hover{--un-text-opacity:1;color:rgba(59,130,246,var(--un-text-opacity));}
 .hover\:text-blue-600:hover{--un-text-opacity:1;color:rgba(37,99,235,var(--un-text-opacity));}
 .hover\:text-green-500:hover{--un-text-opacity:1;color:rgba(34,197,94,var(--un-text-opacity));}
+.hover\:text-red-500:hover{--un-text-opacity:1;color:rgba(239,68,68,var(--un-text-opacity));}
 .hover\:text-yellow-500:hover{--un-text-opacity:1;color:rgba(234,179,8,var(--un-text-opacity));}
 .shadow-lg{--un-shadow:var(--un-shadow-inset) 0 10px 15px -3px var(--un-shadow-color, rgba(0,0,0,0.1)),var(--un-shadow-inset) 0 4px 6px -4px var(--un-shadow-color, rgba(0,0,0,0.1));box-shadow:var(--un-ring-offset-shadow), var(--un-ring-shadow), var(--un-shadow);}
 .outline-0{outline-width:0;}

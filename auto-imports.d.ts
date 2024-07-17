@@ -15,6 +15,8 @@ declare global {
   const ATabs: typeof import('antd/es')['Tabs']
   const ATooltip: typeof import('antd/es')['Tooltip']
   const AntDesignResolver: typeof import('./utils/antd-resolver')['AntDesignResolver']
+  const DeleteOutlined: typeof import('@ant-design/icons')['DeleteOutlined']
+  const ExclamationCircleOutlined: typeof import('@ant-design/icons')['ExclamationCircleOutlined']
   const IMdiClockCheckOutline: typeof import('~icons/mdi/clock-check-outline.jsx')['default']
   const IMdiClockTimeSevenOutline: typeof import('~icons/mdi/clock-time-seven-outline.jsx')['default']
   const IMdiFolderOutline: typeof import('~icons/mdi/folder-outline.jsx')['default']

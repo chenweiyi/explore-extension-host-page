@@ -3,7 +3,7 @@ import Gantt, { IChildTask, IStatus, ITask, ITask2 } from './gantt/Gantt'
 import Toolbox from './gantt/Toolbox'
 import AddTask from './gantt/AddTask'
 import Analysis from './gantt/Analysis'
-import { message } from 'antd'
+import { message, Modal } from 'antd'
 // import demoData from './data'
 import {
   AIncludeB,
@@ -16,7 +16,7 @@ import {
   timeOutTasks
 } from './gantt/util'
 
-export type IShowType = '' | 'add' | 'analysis' | 'refresh'
+export type IShowType = '' | 'add' | 'analysis' | 'refresh' | 'delete'
 export type IOriTask = Omit<ITask, 'children' | 'level' | 'status'> & {
   color?: string
   link?: string
@@ -356,6 +356,19 @@ const Calendar = () => {
     if (showType === 'refresh') {
       ganttRef.current?.refresh()
       setShowType('')
+    }
+    if (showType === 'delete') {
+      Modal.confirm({
+        icon: <ExclamationCircleOutlined />,
+        content: '确定要删除所有任务吗？',
+        onOk() {
+          setOriTasks([])
+          setShowType('')
+        },
+        onCancel() {
+          setShowType('')
+        }
+      })
     }
   }, [showType])
 

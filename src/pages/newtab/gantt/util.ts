@@ -146,8 +146,8 @@ export const splitAvaliableTimes = (
         arr.push({
           type: 'start',
           data: [
-            availTimes[start],
-            dayjs(availTimes[start]).add(1, 'day').format('YYYY-MM-DD')
+            availTimes[i],
+            dayjs(availTimes[i]).add(1, 'day').format('YYYY-MM-DD')
           ]
         })
       } else if (dayjs(startTime).isBefore(dayjs(availTimes[0]))) {
@@ -168,6 +168,11 @@ export const splitAvaliableTimes = (
         throw new Error('startTime > availTimes[0]')
       }
     }
+    const latest = arr[arr.length - 1]
+    if (!latest) {
+      throw new Error('latest is null')
+    }
+    latest.data[1] = dayjs(availTimes[i]).add(1, 'day').format('YYYY-MM-DD')
     if (diffDays > 1) {
       arr.push({
         type: 'block',
@@ -186,11 +191,6 @@ export const splitAvaliableTimes = (
         ]
       })
     } else {
-      const latest = arr[arr.length - 1]
-      if (!latest) {
-        throw new Error('latest is null')
-      }
-      latest.data[1] = dayjs(availTimes[i]).add(1, 'day').format('YYYY-MM-DD')
       if (i === availTimes.length - 1) {
         latest.type = 'end' as const
       }

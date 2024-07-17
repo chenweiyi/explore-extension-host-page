@@ -53,7 +53,7 @@ const AddTask = (props: IAddTaskProps) => {
     console.log(value)
     const options = {
       name: value.name,
-      color: value.color,
+      color: value.color?.toHexString() ?? '',
       startTime: dayjs(value.timescope[0]).format(dateFormat),
       endTime: dayjs(value.timescope[1]).format(dateFormat),
       link: value.link,

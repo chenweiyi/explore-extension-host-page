@@ -33,7 +33,7 @@ const Toolbox = (props: IToolboxProps) => {
           onClick={() => props.setShowType('analysis')}
         />
       </ATooltip>
-      <ATooltip title='刷新重置' placement='right' className='mb-20px'>
+      <ATooltip title='刷新' placement='right' className='mb-20px'>
         <SyncOutlined
           className={clsx(
             'text-20px transition cursor-pointer hover:text-green-500 hover:scale-110',
@@ -43,6 +43,18 @@ const Toolbox = (props: IToolboxProps) => {
             }
           )}
           onClick={() => props.setShowType('refresh')}
+        />
+      </ATooltip>
+      <ATooltip title='重置' placement='right' className='mb-20px'>
+        <DeleteOutlined
+          className={clsx(
+            'text-20px transition cursor-pointer hover:text-red-500 hover:scale-110',
+            {
+              'text-red-500': props.showType === 'delete',
+              'font-semibold': props.showType === 'delete'
+            }
+          )}
+          onClick={() => props.setShowType('delete')}
         />
       </ATooltip>
     </div>
