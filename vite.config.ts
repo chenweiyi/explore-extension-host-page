@@ -11,6 +11,7 @@ import IconsResolver from 'unplugin-icons/resolver'
 import AutoImport from 'unplugin-auto-import/vite'
 import UnoCSS from 'unocss/vite'
 import { AntDesignResolver } from './utils/antd-resolver'
+// import { visualizer } from 'rollup-plugin-visualizer'
 
 const rootDir = resolve(__dirname)
 const srcDir = resolve(rootDir, 'src')
@@ -77,6 +78,9 @@ export default defineConfig({
     customDynamicImport(),
     addHmr({ background: enableHmrInBackgroundScript, view: true }),
     watchRebuild()
+    // visualizer({
+    //   open: true
+    // })
   ],
   publicDir,
   build: {
