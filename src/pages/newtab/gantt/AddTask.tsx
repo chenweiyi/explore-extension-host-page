@@ -13,6 +13,9 @@ const AddTask = (props: IAddTaskProps) => {
   const [endTime, setEndTime] = useState('')
   const [parallelTimes, setParallelTimes] = useState<string[]>([])
   const [form] = Form.useForm()
+  const initialValues = {
+    color: null
+  }
 
   const rules = {
     name: [
@@ -68,19 +71,26 @@ const AddTask = (props: IAddTaskProps) => {
   }
 
   return (
-    <div className='w-500px h-400px'>
+    <div className='w-400px h-400px'>
       <AForm
         form={form}
         name='addTask'
-        labelCol={{ span: 5 }}
+        initialValues={initialValues}
+        labelCol={{ span: 6 }}
         labelAlign='left'
         onFinish={onFinish}
       >
         <AForm.Item label='任务名：' name='name' rules={rules.name}>
           <AInput placeholder='请输入任务名称' />
         </AForm.Item>
-        <AForm.Item label='任务周期：' name='timescope' rules={rules.timescope}>
+        <AForm.Item
+          label='任务周期：'
+          name='timescope'
+          rules={rules.timescope}
+          validateFirst={true}
+        >
           <ADatePicker.RangePicker
+            className='w-full'
             format='YYYY-MM-DD'
             onChange={onChangeRange}
           />
@@ -93,7 +103,7 @@ const AddTask = (props: IAddTaskProps) => {
           />
         </AForm.Item>
         <AForm.Item label='任务颜色：' name='color'>
-          <AColorPicker />
+          <AColorPicker allowClear />
         </AForm.Item>
         <AForm.Item label='任务链接：' name='link'>
           <AInput placeholder='请输入任务链接, 例如：https://www.baidu.com' />

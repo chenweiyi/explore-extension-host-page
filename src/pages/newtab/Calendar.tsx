@@ -384,7 +384,7 @@ const Calendar = () => {
 
   return (
     <div className='flex flex-wrap w-full h-full pl-120px pr-40px items-center justify-center'>
-      <div className='calendar-container w-800px h-400px mr-150px relative'>
+      <div className='calendar-container w-800px h-400px mr-120px relative'>
         <Gantt
           ref={ganttRef}
           width={svgWidth}
