@@ -8,15 +8,31 @@ type IAnalysisProps = {
 
 const TaskList = (props: IAnalysisProps) => {
   return props.tasks.length > 0 ? (
-    <ul>
+    <ul className='pl-20px list-circle'>
       {props.tasks.map((t, i) => (
         <li
           key={i}
-          className='py-8px px-4px cursor-pointer hover:bg-emerald-200'
+          className='py-12px px-4px cursor-pointer hover:bg-[rgb(90,238,198,0.35)] rounded-4px'
           onClick={() => props.clickTask(t)}
         >
-          <div className='text-14px'>{t.name}</div>
-          <div className='text-12px text-gray-500'>
+          <div
+            className='text-16px font-semibold custom-ellipsis'
+            title={t.name}
+          >
+            {t.link ? (
+              <a href={t.link} target='_blank' rel='noreferrer'>
+                {t.name}
+              </a>
+            ) : (
+              t.name
+            )}
+          </div>
+          {t.desc ? (
+            <div className='text-12px text-gray-400 w-full text-wrap my-4px'>
+              {t.desc}
+            </div>
+          ) : null}
+          <div className='text-12px'>
             <span>{dayjs(t.startTime).format('YYYY-MM-DD')}</span>
             <span> -- </span>
             <span>{dayjs(t.endTime).format('YYYY-MM-DD')}</span>
@@ -120,7 +136,7 @@ const Analysis = (props: IAnalysisProps) => {
   }, [])
 
   return (
-    <div className='w-500px h-400px'>
+    <div className='w-full h-full'>
       <ATabs
         items={tabItems}
         defaultActiveKey='doing'

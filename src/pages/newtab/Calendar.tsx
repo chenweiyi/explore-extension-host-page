@@ -62,6 +62,8 @@ const Calendar = () => {
   const [oriTasks, setOriTasks] = useState<IOriTask[]>([])
   const [tasks, setTasks] = useState<ITask[]>([])
   const [messageApi, contextHolder] = message.useMessage()
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  const [drawerTitle, setDrawerTitle] = useState('')
   const commingThreshold = 2
   const expiringThreshold = 2
 
@@ -340,6 +342,11 @@ const Calendar = () => {
     return tasks3
   }
 
+  const closeDrawer = () => {
+    setDrawerOpen(false)
+    setShowType('')
+  }
+
   useUpdateEffect(() => {
     console.log('---- oriTasks change ----', oriTasks)
     chrome.storage.sync.set({
@@ -356,8 +363,7 @@ const Calendar = () => {
     if (showType === 'refresh') {
       ganttRef.current?.refresh()
       setShowType('')
-    }
-    if (showType === 'delete') {
+    } else if (showType === 'delete') {
       Modal.confirm({
         icon: <ExclamationCircleOutlined />,
         content: '确定要删除所有任务吗？',
@@ -369,6 +375,12 @@ const Calendar = () => {
           setShowType('')
         }
       })
+    } else if (showType === 'analysis') {
+      setDrawerOpen(true)
+      setDrawerTitle('分析面板')
+    } else if (showType === 'add') {
+      setDrawerOpen(true)
+      setDrawerTitle('添加任务')
     }
   }, [showType])
 
@@ -384,7 +396,7 @@ const Calendar = () => {
 
   return (
     <div className='flex flex-wrap w-full h-full pl-120px pr-40px items-center justify-center'>
-      <div className='calendar-container w-800px h-400px mr-120px relative'>
+      <div className='calendar-container w-800px h-400px mr-120px my-20px relative'>
         <Gantt
           ref={ganttRef}
           width={svgWidth}
@@ -393,10 +405,17 @@ const Calendar = () => {
         />
         <Toolbox showType={showType} setShowType={setShowType} />
       </div>
-      {showType === 'add' && <AddTask addTask={addTask} />}
-      {showType === 'analysis' && (
-        <Analysis tasks={tasks} clickTask={clickTaskHandle} />
-      )}
+      <ADrawer
+        title={drawerTitle}
+        open={drawerOpen}
+        onClose={closeDrawer}
+        width={600}
+      >
+        {showType === 'add' && <AddTask addTask={addTask} />}
+        {showType === 'analysis' && (
+          <Analysis tasks={tasks} clickTask={clickTaskHandle} />
+        )}
+      </ADrawer>
       {contextHolder}
     </div>
   )

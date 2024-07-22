@@ -9,6 +9,7 @@ declare global {
   const AColorPicker: typeof import('antd/es')['ColorPicker']
   const AConfigProvider: typeof import('antd/es')['ConfigProvider']
   const ADatePicker: typeof import('antd/es')['DatePicker']
+  const ADrawer: typeof import('antd/es')['Drawer']
   const AForm: typeof import('antd/es')['Form']
   const AInput: typeof import('antd/es')['Input']
   const ASwitch: typeof import('antd/es')['Switch']

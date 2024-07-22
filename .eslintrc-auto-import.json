@@ -129,6 +129,7 @@
     "ASwitch": true,
     "SyncOutlined": true,
     "DeleteOutlined": true,
-    "ExclamationCircleOutlined": true
+    "ExclamationCircleOutlined": true,
+    "ADrawer": true
   }
 }

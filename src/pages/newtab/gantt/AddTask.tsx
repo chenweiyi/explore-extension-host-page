@@ -71,13 +71,13 @@ const AddTask = (props: IAddTaskProps) => {
   }
 
   return (
-    <div className='w-400px h-400px'>
+    <div className='w-full h-full'>
       <AForm
         form={form}
         name='addTask'
         initialValues={initialValues}
         labelCol={{ span: 6 }}
-        labelAlign='left'
+        labelAlign='right'
         onFinish={onFinish}
       >
         <AForm.Item label='任务名：' name='name' rules={rules.name}>
@@ -95,7 +95,7 @@ const AddTask = (props: IAddTaskProps) => {
             onChange={onChangeRange}
           />
         </AForm.Item>
-        <AForm.Item label='支持并行时间：' name='parallelTimes'>
+        <AForm.Item label='并行时间：' name='parallelTimes'>
           <ADatePicker
             multiple
             format='YYYY-MM-DD'
@@ -111,7 +111,7 @@ const AddTask = (props: IAddTaskProps) => {
         <AForm.Item label='任务描述：' name='desc'>
           <AInput.TextArea placeholder='请输入任务描述' />
         </AForm.Item>
-        <AForm.Item wrapperCol={{ span: 14, offset: 5 }}>
+        <AForm.Item wrapperCol={{ span: 18, offset: 6 }}>
           <AButton type='primary' htmlType='submit'>
             创建任务
           </AButton>
