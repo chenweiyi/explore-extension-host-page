@@ -70,6 +70,7 @@ const Gantt = (props: IGanttProps, ref) => {
   const todayColor = 'rgba(243, 150, 17, 0.2)'
   const defaultBlockColor = '#e9e9eb'
   const margin = { top: 20, right: 50, bottom: 30, left: 50 }
+  const scaleExtent: [number, number] = [0.2, 15]
 
   const [power, setPower] = useState({})
 
@@ -84,6 +85,16 @@ const Gantt = (props: IGanttProps, ref) => {
       return 4
     } else if (transform.k >= 0.4 && transform.k < 0.5) {
       return 5
+    } else if (transform.k >= 0.3 && transform.k < 0.4) {
+      return 6
+    } else if (transform.k >= 0.2 && transform.k < 0.3) {
+      return 7
+    } else if (transform.k >= 0.1 && transform.k < 0.2) {
+      return 8
+    } else if (transform.k >= 0.05 && transform.k < 0.1) {
+      return 9
+    } else if (transform.k >= 0.02 && transform.k < 0.05) {
+      return 10
     }
     return 6
   }
@@ -224,6 +235,7 @@ const Gantt = (props: IGanttProps, ref) => {
         .style('stroke-dasharray', '5,5')
         .datum(d)
 
+      // x轴标签样式
       d3.selectAll('.axis--x .tick text')
         .filter(
           (_d: { time: Date }) =>
@@ -231,6 +243,23 @@ const Gantt = (props: IGanttProps, ref) => {
         )
         .style('fill', hoverTickFillColor)
         .style('font-size', hoverTickFontSize)
+
+      // y轴标签样式
+      let yTextOrSpan = d3
+        .selectAll('.axis--y .tick text')
+        .filter((t: { name: string }) => t.name === d.name)
+      // console.log('yTextOrSpan:', yTextOrSpan)
+      if (yTextOrSpan.empty()) {
+        yTextOrSpan = d3
+          .selectAll('.axis--y .tick text tspan')
+          .filter((t: { name: string }) => t.name === d.name)
+      }
+
+      if (!yTextOrSpan.empty()) {
+        yTextOrSpan
+          .style('fill', hoverTickFillColor)
+          .style('font-size', hoverTickFontSize)
+      }
     }
 
     /**
@@ -280,6 +309,23 @@ const Gantt = (props: IGanttProps, ref) => {
         )
         .style('fill', textColor)
         .style('font-size', textFontSize)
+
+      // 还原y轴标签样式
+      // y轴标签样式
+      // y轴标签样式
+      let yTextOrSpan = d3
+        .selectAll('.axis--y .tick text')
+        .filter((t: { name: string }) => t.name === d.name)
+      // console.log('yTextOrSpan:', yTextOrSpan)
+      if (yTextOrSpan.empty()) {
+        yTextOrSpan = d3
+          .selectAll('.axis--y .tick text tspan')
+          .filter((t: { name: string }) => t.name === d.name)
+      }
+
+      if (!yTextOrSpan.empty()) {
+        yTextOrSpan.style('fill', textColor).style('font-size', textFontSize)
+      }
     }
 
     function barClickHandler(e, d, x, y, transform) {
@@ -325,7 +371,11 @@ const Gantt = (props: IGanttProps, ref) => {
         })
         .on('click', function (e, d) {
           barClickHandler.call(this, e, d, x, y, transform)
-          activeData = d
+          if (activeData && activeData.name === d.name) {
+            activeData = null
+          } else {
+            activeData = d
+          }
         })
     }
 
@@ -393,8 +443,8 @@ const Gantt = (props: IGanttProps, ref) => {
                   : d3.timeFormat('%m-%d')(val as Date)
               // 设置text文字样式
               d3.select(this)
-                .style('fill', 'black')
-                .style('font-size', '10px')
+                .style('fill', textColor)
+                .style('font-size', textFontSize)
                 .datum({ time: val })
 
               return labelText
@@ -415,10 +465,16 @@ const Gantt = (props: IGanttProps, ref) => {
         .tickValues(taskLevels)
         .tickFormat(function (val, index) {
           // console.log('val:', val)
-          return filterTasks
+          // 设置text文字样式
+          const label = filterTasks
             .filter((t) => t.level === +val)
             .map((t) => t.name)
             .join(',')
+          d3.select(this)
+            .style('fill', textColor)
+            .style('font-size', textFontSize)
+            .datum({ name: label })
+          return label
         })
     }
 
@@ -510,6 +566,7 @@ const Gantt = (props: IGanttProps, ref) => {
             .attr('x', '-10')
             .attr('dy', i === 0 ? 0 : '1em')
             .text(t)
+            .datum({ name: t })
         })
       }
     })
@@ -540,7 +597,7 @@ const Gantt = (props: IGanttProps, ref) => {
 
     const zoom = d3
       .zoom()
-      .scaleExtent([0.3, 10])
+      .scaleExtent(scaleExtent)
       .on('start', zoomStart)
       .on('zoom', zoomed)
       .on('end', zoomEnd)
@@ -621,6 +678,7 @@ const Gantt = (props: IGanttProps, ref) => {
               .attr('x', '-10')
               .attr('dy', i === 0 ? '0' : '1em')
               .text(t)
+              .datum({ name: t })
           })
         }
       })

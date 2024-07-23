@@ -23,6 +23,16 @@ const AddTask = (props: IAddTaskProps) => {
         required: true,
         message: '请输入任务名称',
         trigger: 'blur'
+      },
+      {
+        validator: (rule, value, callback) => {
+          if (value.includes(',')) {
+            callback('任务名称不能包含逗号')
+            return
+          }
+          callback()
+        },
+        trigger: 'change'
       }
     ],
     timescope: [
@@ -80,7 +90,12 @@ const AddTask = (props: IAddTaskProps) => {
         labelAlign='right'
         onFinish={onFinish}
       >
-        <AForm.Item label='任务名：' name='name' rules={rules.name}>
+        <AForm.Item
+          label='任务名：'
+          name='name'
+          rules={rules.name}
+          validateFirst={true}
+        >
           <AInput placeholder='请输入任务名称' />
         </AForm.Item>
         <AForm.Item
