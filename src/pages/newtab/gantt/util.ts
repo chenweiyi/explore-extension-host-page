@@ -114,7 +114,7 @@ export const timeInTask = (
   t: string | Date,
   task: ILikeTask,
   unit = null,
-  includeStr = '[]'
+  includeStr = '[)'
 ) => {
   const { min, max } = getTaskMinMax(task)
   return dayjs(t).isBetween(
@@ -128,10 +128,20 @@ export const timeInTask = (
 /**
  * 时间是否在多个任务内，包含子任务
  */
-export const timeInTasks = (t, tasks: Array<ILikeTask>) => {
+export const timeInTasks = (
+  t,
+  tasks: Array<ILikeTask>,
+  unit = null,
+  includeStr = '[)'
+) => {
   for (let i = 0; i < tasks.length; i++) {
     const { min, max } = getTaskMinMax(tasks[i])
-    return dayjs(t).isBetween(dayjs(min), dayjs(max))
+    return dayjs(t).isBetween(
+      dayjs(min),
+      dayjs(max),
+      unit,
+      includeStr as IDayjsBetweenType
+    )
   }
   return false
 }
@@ -143,7 +153,7 @@ export const timeInWorkTask = (
   t,
   task: ILikeTask2,
   unit = null,
-  includeStr = '[]'
+  includeStr = '[)'
 ) => {
   if (task.children?.length) {
     const filter = task.children.filter((c) => c.type !== 'block')
@@ -161,7 +171,7 @@ export const timeInBlockTask = (
   t,
   task: ILikeTask2,
   unit = null,
-  includeStr = '[]'
+  includeStr = '[)'
 ) => {
   if (task.children?.length) {
     const filter = task.children.filter((c) => c.type === 'block')
@@ -360,7 +370,7 @@ export function genTaskChildren(
     const top1 = tasks[i + 1]
     if (!top1) continue
     top1.parallelTimes?.forEach((p) => {
-      if (timeInTask(p, top1, null, '[)')) {
+      if (timeInTask(p, top1)) {
         parellelTimes.add(p)
       }
     })
@@ -397,7 +407,7 @@ export function genTaskChildren(
           avaliableTimes.push(j.format(dateFormat))
         } else {
           if (
-            timeInWorkTask(j, top1, null, '[)') &&
+            timeInWorkTask(j, top1) &&
             parellelTimes.has(j.format(dateFormat))
           ) {
             // 如果时间在上级任务时间内且在上级可并行时间内，则可用
@@ -512,12 +522,7 @@ export function genTasksStatus(
   const target: Array<ITask> = simpleCopy(tasks)
   for (let i = 0; i < target.length; i++) {
     const task = target[i]
-    const min = task.children?.length
-      ? task.children[0].startTime
-      : task.startTime
-    const max = task.children?.length
-      ? task.children[task.children.length - 1].endTime
-      : task.endTime
+    const { min, max } = getTaskMinMax(task)
     const today = dayjs().startOf('day')
     const status = new Set<string>()
     if (dayjs(min) > today) {
