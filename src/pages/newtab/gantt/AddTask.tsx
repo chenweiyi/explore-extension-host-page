@@ -1,21 +1,29 @@
 import withSuspense from '@src/shared/hoc/withSuspense'
 import { IOriTask } from '../Calendar'
 import { Form } from 'antd'
+import { dateFormat } from './util'
 
 type IAddTaskProps = {
-  addTask: (tasks: IOriTask) => boolean
+  type?: 'add' | 'edit'
+  data?: IOriTask | null
+  addTask?: (tasks: IOriTask) => boolean
+  editTask?: (tasks: IOriTask) => void
 }
 
-const dateFormat = 'YYYY-MM-DD'
-
 const AddTask = (props: IAddTaskProps) => {
+  const { type = 'add', addTask, data, editTask } = props
   const [startTime, setStartTime] = useState('')
   const [endTime, setEndTime] = useState('')
   const [parallelTimes, setParallelTimes] = useState<string[]>([])
   const [form] = Form.useForm()
-  const initialValues = {
-    color: null
-  }
+  const [initialValues] = useState({
+    color: data?.color || null,
+    name: data?.name,
+    timescope: data ? [dayjs(data.startTime), dayjs(data.endTime)] : null,
+    parallelTimes: data ? data.parallelTimes.map((d) => dayjs(d)) : null,
+    link: data?.link,
+    desc: data?.desc
+  })
 
   const rules = {
     name: [
@@ -54,12 +62,14 @@ const AddTask = (props: IAddTaskProps) => {
   }
 
   const onChangeRange = (dates: any) => {
-    setStartTime(dayjs(dates[0]).format(dateFormat))
-    setEndTime(dayjs(dates[1]).format(dateFormat))
+    if (dates) {
+      setStartTime(dayjs(dates[0]).format(dateFormat))
+      setEndTime(dayjs(dates[1]).format(dateFormat))
+    }
   }
 
   const onChangeParallelTimes = (dates: any) => {
-    setParallelTimes(dates.map((d) => dayjs(d).format(dateFormat)))
+    setParallelTimes(dates?.map((d) => dayjs(d).format(dateFormat)) ?? [])
   }
 
   const onFinish = (value: any) => {
@@ -69,14 +79,18 @@ const AddTask = (props: IAddTaskProps) => {
       color: value.color?.toHexString() ?? '',
       startTime: dayjs(value.timescope[0]).format(dateFormat),
       endTime: dayjs(value.timescope[1]).format(dateFormat),
-      link: value.link,
-      desc: value.desc,
+      link: value.link || '',
+      desc: value.desc || '',
       parallelTimes: parallelTimes
     }
     console.log('options:', options)
-    const res = props.addTask(options)
-    if (res) {
-      form.resetFields()
+    if (type === 'add') {
+      const res = addTask?.(options)
+      if (res) {
+        form.resetFields()
+      }
+    } else if (type === 'edit') {
+      editTask?.(options)
     }
   }
 
@@ -128,7 +142,7 @@ const AddTask = (props: IAddTaskProps) => {
         </AForm.Item>
         <AForm.Item wrapperCol={{ span: 18, offset: 6 }}>
           <AButton type='primary' htmlType='submit'>
-            创建任务
+            {type === 'add' ? '创建任务' : '编辑任务'}
           </AButton>
         </AForm.Item>
       </AForm>

@@ -1,5 +1,5 @@
 import withSuspense from '@src/shared/hoc/withSuspense'
-import Gantt, { IChildTask, ITask } from './gantt/Gantt'
+import Gantt, { IChildTask, ITask, ITask2 } from './gantt/Gantt'
 import Toolbox from './gantt/Toolbox'
 import AddTask from './gantt/AddTask'
 import Analysis from './gantt/Analysis'
@@ -7,7 +7,7 @@ import { message, Modal } from 'antd'
 // import demoData from './data'
 import { regenTasks } from './gantt/util'
 
-export type IShowType = '' | 'add' | 'analysis' | 'refresh' | 'delete'
+export type IShowType = '' | 'add' | 'edit' | 'analysis' | 'refresh' | 'delete'
 export type IOriTask = Omit<ITask, 'children' | 'level' | 'status'> & {
   color?: string
   link?: string
@@ -36,10 +36,12 @@ const Calendar = () => {
   const [showType, setShowType] = useState<IShowType>('')
   const ganttRef = useRef(null)
   const [oriTasks, setOriTasks] = useState<IOriTask[]>([])
+  const latestOriTasks = useLatest(oriTasks)
   const [tasks, setTasks] = useState<ITask[]>([])
   const [messageApi, contextHolder] = message.useMessage()
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [drawerTitle, setDrawerTitle] = useState('')
+  const [activeTask, setActiveTask] = useState<IOriTask | null>(null)
   const commingThreshold = 2
   const expiringThreshold = 2
 
@@ -68,9 +70,44 @@ const Calendar = () => {
     }
   }
 
+  function editTask(t: IOriTask) {
+    if (
+      oriTasks.filter((o) => o.name !== t.name).find((o) => o.name === t.name)
+    ) {
+      messageApi.open({
+        type: 'error',
+        content: '任务名称重复'
+      })
+    } else {
+      const task = oriTasks.find((o) => o.name === t.name)
+      const index = oriTasks.findIndex((o) => o.name === t.name)
+      if (index > -1) {
+        const tasks = [...oriTasks]
+        tasks.splice(index, 1, {
+          ...task,
+          ...t
+        })
+        setOriTasks(tasks)
+        messageApi.open({
+          type: 'success',
+          content: '任务编辑成功'
+        })
+      }
+    }
+  }
+
   const closeDrawer = () => {
     setDrawerOpen(false)
     setShowType('')
+  }
+
+  const clickBarGroup = (t: ITask2) => {
+    console.log('clickBarGroup:', t)
+    const task = latestOriTasks.current.find((o) => o.name === t.name)
+    if (task) {
+      setActiveTask(task)
+      setShowType('edit')
+    }
   }
 
   useUpdateEffect(() => {
@@ -113,6 +150,9 @@ const Calendar = () => {
     } else if (showType === 'add') {
       setDrawerOpen(true)
       setDrawerTitle('添加任务')
+    } else if (showType === 'edit') {
+      setDrawerOpen(true)
+      setDrawerTitle(`编辑任务 - ${activeTask?.name}`)
     }
   }, [showType])
 
@@ -134,6 +174,7 @@ const Calendar = () => {
           width={svgWidth}
           height={svgHeight}
           tasks={tasks}
+          onClickBarGroup={clickBarGroup}
         />
         <Toolbox showType={showType} setShowType={setShowType} />
       </div>
@@ -142,8 +183,12 @@ const Calendar = () => {
         open={drawerOpen}
         onClose={closeDrawer}
         width={600}
+        destroyOnClose={true}
       >
-        {showType === 'add' && <AddTask addTask={addTask} />}
+        {showType === 'add' && <AddTask type={showType} addTask={addTask} />}
+        {showType === 'edit' && (
+          <AddTask type={showType} data={activeTask} editTask={editTask} />
+        )}
         {showType === 'analysis' && (
           <Analysis tasks={tasks} clickTask={clickTaskHandle} />
         )}

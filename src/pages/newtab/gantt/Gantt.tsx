@@ -54,6 +54,7 @@ export type IGanttProps = {
   startTime?: string
   endTime?: string
   onSvgDblClick?: () => void
+  onClickBarGroup?: (t: ITask2) => void
 }
 
 const Gantt = (props: IGanttProps, ref) => {
@@ -120,7 +121,8 @@ const Gantt = (props: IGanttProps, ref) => {
       tasks: _tasks,
       startTime: _startTime,
       endTime: _endTime,
-      onSvgDblClick
+      onSvgDblClick,
+      onClickBarGroup
     } = props
     let hoverData: ITask2 | IChildTask2 | null = null
     let activeData: ITask2 | null = null
@@ -409,6 +411,10 @@ const Gantt = (props: IGanttProps, ref) => {
           } else {
             return x(d.endTime) - x(d.startTime)
           }
+        })
+        .on('dblclick', function (e, d) {
+          console.log('dblclick:', d)
+          onClickBarGroup(d)
         })
         .selectAll('.bar')
         .data((d) => (d.children?.length ? [...d.children] : [d]))
