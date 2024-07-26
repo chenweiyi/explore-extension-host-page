@@ -247,12 +247,17 @@ const Gantt = (props: IGanttProps, ref) => {
       // y轴标签样式
       let yTextOrSpan = d3
         .selectAll('.axis--y .tick text')
-        .filter((t: { name: string }) => t.name === d.name)
+        .filter(
+          (t: { name: string }) => t.name === ((d as IChildTask2).pid || d.name)
+        )
       // console.log('yTextOrSpan:', yTextOrSpan)
       if (yTextOrSpan.empty()) {
         yTextOrSpan = d3
           .selectAll('.axis--y .tick text tspan')
-          .filter((t: { name: string }) => t.name === d.name)
+          .filter(
+            (t: { name: string }) =>
+              t.name === ((d as IChildTask2).pid || d.name)
+          )
       }
 
       if (!yTextOrSpan.empty()) {
@@ -315,12 +320,17 @@ const Gantt = (props: IGanttProps, ref) => {
       // y轴标签样式
       let yTextOrSpan = d3
         .selectAll('.axis--y .tick text')
-        .filter((t: { name: string }) => t.name === d.name)
+        .filter(
+          (t: { name: string }) => t.name === ((d as IChildTask2).pid || d.name)
+        )
       // console.log('yTextOrSpan:', yTextOrSpan)
       if (yTextOrSpan.empty()) {
         yTextOrSpan = d3
           .selectAll('.axis--y .tick text tspan')
-          .filter((t: { name: string }) => t.name === d.name)
+          .filter(
+            (t: { name: string }) =>
+              t.name === ((d as IChildTask2).pid || d.name)
+          )
       }
 
       if (!yTextOrSpan.empty()) {
@@ -769,8 +779,11 @@ const Gantt = (props: IGanttProps, ref) => {
       renderChart({
         ...props,
         startTime:
-          props.startTime || dayjs().subtract(7, 'day').startOf('day').toDate(),
-        endTime: props.endTime || dayjs().add(7, 'day').startOf('day').toDate()
+          props.startTime ||
+          dayjs().subtract(7, 'day').startOf('day').format('YYYY-MM-DD'),
+        endTime:
+          props.endTime ||
+          dayjs().add(7, 'day').startOf('day').format('YYYY-MM-DD')
       })
     )
   }, [])
