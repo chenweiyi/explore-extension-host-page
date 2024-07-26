@@ -96,6 +96,21 @@ const Calendar = () => {
     }
   }
 
+  function deleteTask(t: IOriTask) {
+    const index = oriTasks.findIndex((o) => o.name === t.name)
+    if (index > -1) {
+      const tasks = [...oriTasks]
+      tasks.splice(index, 1)
+      setOriTasks(tasks)
+      messageApi.open({
+        type: 'success',
+        content: '任务删除成功'
+      })
+      setShowType('')
+      setDrawerOpen(false)
+    }
+  }
+
   const closeDrawer = () => {
     setDrawerOpen(false)
     setShowType('')
@@ -168,7 +183,7 @@ const Calendar = () => {
 
   return (
     <div className='flex flex-wrap w-full h-full pl-120px pr-40px items-center justify-center'>
-      <div className='calendar-container w-800px h-400px mr-120px my-20px relative'>
+      <div className='calendar-container w-800px h-400px my-40px relative'>
         <Gantt
           ref={ganttRef}
           width={svgWidth}
@@ -187,7 +202,12 @@ const Calendar = () => {
       >
         {showType === 'add' && <AddTask type={showType} addTask={addTask} />}
         {showType === 'edit' && (
-          <AddTask type={showType} data={activeTask} editTask={editTask} />
+          <AddTask
+            type={showType}
+            data={activeTask}
+            editTask={editTask}
+            deleteTask={deleteTask}
+          />
         )}
         {showType === 'analysis' && (
           <Analysis tasks={tasks} clickTask={clickTaskHandle} />

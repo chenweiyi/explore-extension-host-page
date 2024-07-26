@@ -2,16 +2,18 @@ import withSuspense from '@src/shared/hoc/withSuspense'
 import { IOriTask } from '../Calendar'
 import { Form } from 'antd'
 import { dateFormat } from './util'
+import { Modal } from 'antd'
 
 type IAddTaskProps = {
   type?: 'add' | 'edit'
   data?: IOriTask | null
   addTask?: (tasks: IOriTask) => boolean
   editTask?: (tasks: IOriTask) => void
+  deleteTask?: (tasks: IOriTask) => void
 }
 
 const AddTask = (props: IAddTaskProps) => {
-  const { type = 'add', addTask, data, editTask } = props
+  const { type = 'add', addTask, data, editTask, deleteTask } = props
   const [startTime, setStartTime] = useState('')
   const [endTime, setEndTime] = useState('')
   const [parallelTimes, setParallelTimes] = useState<string[]>([])
@@ -72,11 +74,23 @@ const AddTask = (props: IAddTaskProps) => {
     setParallelTimes(dates?.map((d) => dayjs(d).format(dateFormat)) ?? [])
   }
 
+  const getColor = (color: string | null) => {
+    if (!color) return ''
+    const color1 = color.replace('#', '')
+    if (color1.length === 8) {
+      if (color1.slice(6) === '00') {
+        return ''
+      }
+      return color
+    }
+    return color
+  }
+
   const onFinish = (value: any) => {
     console.log(value)
     const options = {
       name: value.name,
-      color: value.color?.toHexString() ?? '',
+      color: getColor(value.color?.toHexString()),
       startTime: dayjs(value.timescope[0]).format(dateFormat),
       endTime: dayjs(value.timescope[1]).format(dateFormat),
       link: value.link || '',
@@ -92,6 +106,23 @@ const AddTask = (props: IAddTaskProps) => {
     } else if (type === 'edit') {
       editTask?.(options)
     }
+  }
+
+  const onDeleteTask = () => {
+    Modal.confirm({
+      title: '提示',
+      icon: <ExclamationCircleOutlined />,
+      centered: true,
+      content: (
+        <div className='my-10px'>
+          确定要删除任务
+          <span className='mx-4px font-semibold'>{data.name}</span> 吗？
+        </div>
+      ),
+      onOk() {
+        deleteTask?.(data)
+      }
+    })
   }
 
   return (
@@ -142,8 +173,18 @@ const AddTask = (props: IAddTaskProps) => {
         </AForm.Item>
         <AForm.Item wrapperCol={{ span: 18, offset: 6 }}>
           <AButton type='primary' htmlType='submit'>
-            {type === 'add' ? '创建任务' : '编辑任务'}
+            {type === 'add' ? '保存' : '更新'}
           </AButton>
+          {type === 'edit' && (
+            <AButton
+              type='primary'
+              danger
+              onClick={onDeleteTask}
+              className='ml-20px'
+            >
+              删除
+            </AButton>
+          )}
         </AForm.Item>
       </AForm>
     </div>
