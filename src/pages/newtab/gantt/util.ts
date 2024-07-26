@@ -52,6 +52,62 @@ type ILikeTask2 = {
 export const dateFormat = 'YYYY-MM-DD'
 
 /**
+ * 获取所给任务的最大，最小时间
+ */
+export const getTaskMinMax = (task: ILikeTask) => {
+  const min = task.children?.length
+    ? task.children[0].startTime
+    : task.startTime
+  const max = task.children?.length
+    ? task.children[task.children.length - 1].endTime
+    : task.endTime
+  return { min, max }
+}
+
+/**
+ * 获取所给任务之前的所有任务的最大，最小时间
+ */
+export const getTopTasksMinMaxTime = (
+  sortTasks: ILikeTask[],
+  start: number
+) => {
+  let minTime = 0,
+    maxTime = 0
+  if (start >= sortTasks.length) {
+    throw new Error('start >= sortTasks.length')
+  }
+  for (let j = start; j < sortTasks.length; j++) {
+    const t2 = sortTasks[j]
+    minTime = minTime
+      ? Math.min(
+          dayjs(
+            t2.children?.length ? t2.children[0].startTime : t2.startTime
+          ).valueOf(),
+          minTime
+        )
+      : dayjs(
+          t2.children?.length ? t2.children[0].startTime : t2.startTime
+        ).valueOf()
+
+    maxTime = maxTime
+      ? Math.max(
+          dayjs(
+            t2.children?.length
+              ? t2.children[t2.children.length - 1].endTime
+              : t2.endTime
+          ).valueOf(),
+          maxTime
+        )
+      : dayjs(
+          t2.children?.length
+            ? t2.children[t2.children.length - 1].endTime
+            : t2.endTime
+        ).valueOf()
+  }
+  return { minTime, maxTime }
+}
+
+/**
  * 时间是否在任务内，包含子任务
  */
 export const timeInTask = (
@@ -60,12 +116,7 @@ export const timeInTask = (
   unit = null,
   includeStr = '[]'
 ) => {
-  const min = task.children?.length
-    ? task.children[0].startTime
-    : task.startTime
-  const max = task.children?.length
-    ? task.children[task.children.length - 1].endTime
-    : task.endTime
+  const { min, max } = getTaskMinMax(task)
   return dayjs(t).isBetween(
     dayjs(min),
     dayjs(max),
@@ -79,13 +130,7 @@ export const timeInTask = (
  */
 export const timeInTasks = (t, tasks: Array<ILikeTask>) => {
   for (let i = 0; i < tasks.length; i++) {
-    const task = tasks[i]
-    const min = task.children?.length
-      ? task.children[0].startTime
-      : task.startTime
-    const max = task.children?.length
-      ? task.children[task.children.length - 1].endTime
-      : task.endTime
+    const { min, max } = getTaskMinMax(tasks[i])
     return dayjs(t).isBetween(dayjs(min), dayjs(max))
   }
   return false
@@ -139,12 +184,7 @@ export const timeOutTasks = (
   let flag = true
   for (let i = 0; i < tasks.length; i++) {
     const task = tasks[i]
-    const min = task.children?.length
-      ? task.children[0].startTime
-      : task.startTime
-    const max = task.children?.length
-      ? task.children[task.children.length - 1].endTime
-      : task.endTime
+    const { min, max } = getTaskMinMax(task)
     if (
       dayjs(t).isBetween(
         dayjs(min),
@@ -160,6 +200,9 @@ export const timeOutTasks = (
   return flag
 }
 
+/**
+ * 分割可用时间，分隔成多种类型的时间段
+ */
 export const splitAvaliableTimes = (
   availTimes: string[],
   startTime: string
@@ -245,14 +288,8 @@ export const splitAvaliableTimes = (
 }
 
 export const AIncludeB = (a: ILikeTask, b: ILikeTask) => {
-  const minA = a.children?.length ? a.children[0].startTime : a.startTime
-  const maxA = a.children?.length
-    ? a.children[a.children.length - 1].endTime
-    : a.endTime
-  const minB = b.children?.length ? b.children[0].startTime : b.startTime
-  const maxB = b.children?.length
-    ? b.children[b.children.length - 1].endTime
-    : b.endTime
+  const { min: minA, max: maxA } = getTaskMinMax(a)
+  const { min: minB, max: maxB } = getTaskMinMax(b)
   return (
     dayjs(minA).isSameOrBefore(dayjs(minB)) &&
     dayjs(maxA).isSameOrAfter(dayjs(maxB))
@@ -261,16 +298,9 @@ export const AIncludeB = (a: ILikeTask, b: ILikeTask) => {
 
 export const AIncludeBS = (a: ILikeTask, bs: ILikeTask[]) => {
   let flag = true
-  const minA = a.children?.length ? a.children[0].startTime : a.startTime
-  const maxA = a.children?.length
-    ? a.children[a.children.length - 1].endTime
-    : a.endTime
+  const { min: minA, max: maxA } = getTaskMinMax(a)
   for (let i = 0; i < bs.length; i++) {
-    const b = bs[i]
-    const minB = b.children?.length ? b.children[0].startTime : b.startTime
-    const maxB = b.children?.length
-      ? b.children[b.children.length - 1].endTime
-      : b.endTime
+    const { min: minB, max: maxB } = getTaskMinMax(bs[i])
     if (
       !(
         dayjs(minA).isSameOrBefore(dayjs(minB)) &&
@@ -284,6 +314,9 @@ export const AIncludeBS = (a: ILikeTask, bs: ILikeTask[]) => {
   return flag
 }
 
+/**
+ * json深拷贝
+ */
 export const simpleCopy = (obj: object) => {
   if (typeof obj !== 'object') {
     throw new Error('simpleCopy: obj must be an object')
@@ -294,46 +327,10 @@ export const simpleCopy = (obj: object) => {
     return {}
   }
 }
-export const getTopTasksMinMaxTime = (
-  sortTasks: ILikeTask[],
-  start: number
-) => {
-  let minTime = 0,
-    maxTime = 0
-  if (start >= sortTasks.length) {
-    throw new Error('start >= sortTasks.length')
-  }
-  for (let j = start; j < sortTasks.length; j++) {
-    const t2 = sortTasks[j]
-    minTime = minTime
-      ? Math.min(
-          dayjs(
-            t2.children?.length ? t2.children[0].startTime : t2.startTime
-          ).valueOf(),
-          minTime
-        )
-      : dayjs(
-          t2.children?.length ? t2.children[0].startTime : t2.startTime
-        ).valueOf()
 
-    maxTime = maxTime
-      ? Math.max(
-          dayjs(
-            t2.children?.length
-              ? t2.children[t2.children.length - 1].endTime
-              : t2.endTime
-          ).valueOf(),
-          maxTime
-        )
-      : dayjs(
-          t2.children?.length
-            ? t2.children[t2.children.length - 1].endTime
-            : t2.endTime
-        ).valueOf()
-  }
-  return { minTime, maxTime }
-}
-
+/**
+ * 生成任务的子任务及颜色
+ */
 export function genTaskChildren(
   sortTasks: Array<IOriTask>,
   colors: string[],
@@ -400,7 +397,7 @@ export function genTaskChildren(
           avaliableTimes.push(j.format(dateFormat))
         } else {
           if (
-            timeInWorkTask(j, top1) &&
+            timeInWorkTask(j, top1, null, '[)') &&
             parellelTimes.has(j.format(dateFormat))
           ) {
             // 如果时间在上级任务时间内且在上级可并行时间内，则可用
@@ -442,6 +439,9 @@ export function genTaskChildren(
   return tasks
 }
 
+/**
+ * 生成任务的层级
+ */
 export function genTasksLevel(tasks: Array<IGenChildTask>): IGenLevelTask[] {
   const chains: Array<string[]> = []
   const target: Array<IGenLevelTask> = simpleCopy(tasks)
@@ -501,6 +501,9 @@ export function genTasksLevel(tasks: Array<IGenChildTask>): IGenLevelTask[] {
   return target
 }
 
+/**
+ * 生成任务的状态
+ */
 export function genTasksStatus(
   tasks: Array<IGenLevelTask>,
   commingThreshold: number,
@@ -542,6 +545,9 @@ export function genTasksStatus(
   return target
 }
 
+/**
+ * 生成可以给Gantt画图的数据格式
+ */
 export function regenTasks({
   oriTasks,
   colors,
