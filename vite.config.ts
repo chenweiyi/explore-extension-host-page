@@ -61,7 +61,7 @@ export default defineConfig({
         {
           'lodash-es': ['isNil', 'sortBy'],
           clsx: [['default', 'clsx']],
-          dayjs: [['default', 'dayjs']],
+          '@utils/special/dayjs': [['dayjs', 'dayjs']],
           axios: [['default', 'axios']]
         }
       ]

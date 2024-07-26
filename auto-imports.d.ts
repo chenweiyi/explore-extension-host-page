@@ -31,7 +31,7 @@ declare global {
   const base64_to_utf8: typeof import('./utils/tool')['base64_to_utf8']
   const clsx: typeof import('clsx')['default']
   const createRef: typeof import('react')['createRef']
-  const dayjs: typeof import('dayjs')['default']
+  const dayjs: typeof import('@utils/special/dayjs')['dayjs']
   const forwardRef: typeof import('react')['forwardRef']
   const getLanguage: typeof import('./utils/locale-util')['getLanguage']
   const isNil: typeof import('lodash-es')['isNil']
