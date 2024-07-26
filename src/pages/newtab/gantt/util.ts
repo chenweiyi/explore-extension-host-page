@@ -1,4 +1,14 @@
 import { IChildTask, IChildTaskType, IStatus, ITask } from './Gantt'
+import 'dayjs/locale/zh-cn'
+import isBetween from 'dayjs/plugin/isBetween'
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
+
+dayjs.extend(isBetween)
+dayjs.extend(isSameOrBefore)
+dayjs.extend(isSameOrAfter)
+
+export type IDayjsBetweenType = '[]' | '()' | '[)' | '(]'
 
 export type IOriTask = Omit<ITask, 'children' | 'level' | 'status'> & {
   color?: string
@@ -20,7 +30,7 @@ export type IGenChildTask = IOriTask & {
 
 export type IGenLevelTask = Omit<ITask, 'status'>
 
-type ILikeTask = {
+export type ILikeTask = {
   startTime: string | Date
   endTime: string | Date
   children?: Array<{
@@ -45,7 +55,7 @@ export const dateFormat = 'YYYY-MM-DD'
  * 时间是否在任务内，包含子任务
  */
 export const timeInTask = (
-  t,
+  t: string | Date,
   task: ILikeTask,
   unit = null,
   includeStr = '[]'
@@ -56,7 +66,12 @@ export const timeInTask = (
   const max = task.children?.length
     ? task.children[task.children.length - 1].endTime
     : task.endTime
-  return dayjs(t).isBetween(dayjs(min), dayjs(max), unit, includeStr)
+  return dayjs(t).isBetween(
+    dayjs(min),
+    dayjs(max),
+    unit,
+    includeStr as IDayjsBetweenType
+  )
 }
 
 /**
@@ -130,7 +145,14 @@ export const timeOutTasks = (
     const max = task.children?.length
       ? task.children[task.children.length - 1].endTime
       : task.endTime
-    if (dayjs(t).isBetween(dayjs(min), dayjs(max), null, includeStr)) {
+    if (
+      dayjs(t).isBetween(
+        dayjs(min),
+        dayjs(max),
+        null,
+        includeStr as IDayjsBetweenType
+      )
+    ) {
       flag = false
       break
     }
@@ -272,6 +294,45 @@ export const simpleCopy = (obj: object) => {
     return {}
   }
 }
+export const getTopTasksMinMaxTime = (
+  sortTasks: ILikeTask[],
+  start: number
+) => {
+  let minTime = 0,
+    maxTime = 0
+  if (start >= sortTasks.length) {
+    throw new Error('start >= sortTasks.length')
+  }
+  for (let j = start; j < sortTasks.length; j++) {
+    const t2 = sortTasks[j]
+    minTime = minTime
+      ? Math.min(
+          dayjs(
+            t2.children?.length ? t2.children[0].startTime : t2.startTime
+          ).valueOf(),
+          minTime
+        )
+      : dayjs(
+          t2.children?.length ? t2.children[0].startTime : t2.startTime
+        ).valueOf()
+
+    maxTime = maxTime
+      ? Math.max(
+          dayjs(
+            t2.children?.length
+              ? t2.children[t2.children.length - 1].endTime
+              : t2.endTime
+          ).valueOf(),
+          maxTime
+        )
+      : dayjs(
+          t2.children?.length
+            ? t2.children[t2.children.length - 1].endTime
+            : t2.endTime
+        ).valueOf()
+  }
+  return { minTime, maxTime }
+}
 
 export function genTaskChildren(
   sortTasks: Array<IOriTask>,
@@ -299,8 +360,10 @@ export function genTaskChildren(
     // 上一任务的并行时间
     const parellelTimes = new Set()
     // 过滤掉无效的并行时间
-    t.parallelTimes?.forEach((p) => {
-      if (timeInTask(p, t)) {
+    const top1 = tasks[i + 1]
+    if (!top1) continue
+    top1.parallelTimes?.forEach((p) => {
+      if (timeInTask(p, top1, null, '[)')) {
         parellelTimes.add(p)
       }
     })
@@ -308,36 +371,7 @@ export function genTaskChildren(
     if (diffDays <= 0) {
       throw new Error('diffDays <= 0')
     }
-
-    let minTime, maxTime
-    for (let j = i + 1; j < tasks.length; j++) {
-      const t2 = tasks[j]
-      minTime = minTime
-        ? Math.min(
-            dayjs(
-              t2.children?.length ? t2.children[0].startTime : t2.startTime
-            ).valueOf(),
-            minTime
-          )
-        : dayjs(
-            t2.children?.length ? t2.children[0].startTime : t2.startTime
-          ).valueOf()
-
-      maxTime = maxTime
-        ? Math.max(
-            dayjs(
-              t2.children?.length
-                ? t2.children[t2.children.length - 1].endTime
-                : t2.endTime
-            ).valueOf(),
-            maxTime
-          )
-        : dayjs(
-            t2.children?.length
-              ? t2.children[t2.children.length - 1].endTime
-              : t2.endTime
-          ).valueOf()
-    }
+    const { minTime, maxTime } = getTopTasksMinMaxTime(tasks, i + 1)
     if (minTime === 0 || maxTime === 0) {
       throw new Error('min | max === 0')
     }
@@ -365,8 +399,6 @@ export function genTaskChildren(
           // 如果时间 == 上级最小时间，且时间在上级任务可并行时间内，则可用
           avaliableTimes.push(j.format(dateFormat))
         } else {
-          const top1 = tasks[i + 1]
-          if (!top1) continue
           if (
             timeInWorkTask(j, top1) &&
             parellelTimes.has(j.format(dateFormat))

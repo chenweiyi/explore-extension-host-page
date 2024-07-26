@@ -20,7 +20,7 @@
     "build:once": "vite build",
     "dev": "npm run build:hmr && npm run unocss:once && (run-p wss build:dev unocss)",
     "dev:firefox": "npm run build:hmr && (run-p wss build:firefox:watch)",
-    "test": "jest",
+    "test": "vitest",
     "prepare": "husky install",
     "zip": "node ./scripts/zip.js"
   },

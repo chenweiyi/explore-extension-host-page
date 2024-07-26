@@ -1,9 +1,6 @@
 import React from 'react'
 import zhCN from 'antd/es/locale/zh_CN'
 import 'dayjs/locale/zh-cn'
-import isBetween from 'dayjs/plugin/isBetween'
-import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
-import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
 import '@pages/newtab/Newtab.css'
 // import useStorage from '@src/shared/hooks/useStorage'
 // import exampleThemeStorage from '@src/shared/storages/exampleThemeStorage'
@@ -16,10 +13,6 @@ export enum Features {
   tab,
   calendar
 }
-
-dayjs.extend(isBetween)
-dayjs.extend(isSameOrBefore)
-dayjs.extend(isSameOrAfter)
 
 const Newtab = () => {
   const [feature, setFeature] = useState(Features[0])
