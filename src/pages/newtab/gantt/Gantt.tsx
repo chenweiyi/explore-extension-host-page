@@ -64,13 +64,14 @@ const Gantt = (props: IGanttProps, ref) => {
   const offsetDate = 2
   const textColor = 'black'
   const textFontSize = '10px'
+  const textFontFamily = 'sans-serif'
   const hoverBarStrokeColor = 'red'
   const hoverLineStrokeColor = 'red'
   const hoverTickFillColor = 'red'
   const hoverTickFontSize = '12px'
   const todayColor = 'rgba(243, 150, 17, 0.2)'
   const defaultBlockColor = '#e9e9eb'
-  const margin = { top: 20, right: 50, bottom: 30, left: 50 }
+  const margin = { top: 20, right: 30, bottom: 30, left: 30 }
   const scaleExtent: [number, number] = [0.2, 15]
 
   const [power, setPower] = useState({})
@@ -98,6 +99,15 @@ const Gantt = (props: IGanttProps, ref) => {
       return 10
     }
     return 6
+  }
+
+  function getMaxYTextByTasks(tasks: ITask2[]) {
+    let max = 0
+    tasks.forEach((t) => {
+      const len = getTextWidth(t.name, `${textFontSize} ${textFontFamily}`)
+      max = Math.max(max, len)
+    })
+    return max
   }
 
   function transformTasks(tasks: ITask[]): ITask2[] {
@@ -135,6 +145,7 @@ const Gantt = (props: IGanttProps, ref) => {
     const startTime = dayjs(_startTime).toDate()
     const endTime = dayjs(_endTime).toDate()
     let taskLevels = [...new Set(tasks.map((t) => t.level + ''))]
+    let maxYText = Math.ceil(getMaxYTextByTasks(tasks))
     // const startTime = dayjs(d3.min(tasks, (t) => t.startTime))
     //   .subtract(offsetDate, 'day')
     //   .toDate()
@@ -160,19 +171,17 @@ const Gantt = (props: IGanttProps, ref) => {
     //   .add(offsetDate, 'day')
     //   .toDate()
 
-    function genTransform(st, et) {
-      return d3.zoomIdentity
-        .scale(width / (initialXScale(et) - initialXScale(st)))
-        .translate(-initialXScale(st), 0)
+    function genTransform(st, et, x: d3.ScaleTime<number, number, never>) {
+      return d3.zoomIdentity.scale(width / (x(et) - x(st))).translate(-x(st), 0)
     }
 
     // 创建初始化x轴缩放比例
     const initialXScale = d3
       .scaleTime()
       .domain([startTime, endTime])
-      .rangeRound([0, width])
+      .rangeRound([maxYText, width])
 
-    const initialTransform = genTransform(startTime, endTime)
+    const initialTransform = genTransform(startTime, endTime, initialXScale)
     newTransform = initialTransform
 
     console.log('initialTransform:', initialTransform)
@@ -536,7 +545,11 @@ const Gantt = (props: IGanttProps, ref) => {
       .append('g')
       .attr('transform', `translate(${margin.left}, ${margin.top})`)
 
-    const x = d3.scaleTime().domain([startTime, endTime]).rangeRound([0, width])
+    const x = d3
+      .scaleTime()
+      .domain([startTime, endTime])
+      .rangeRound([maxYText, width])
+
     newXScale = x
     const y = d3
       .scaleBand()
@@ -552,40 +565,81 @@ const Gantt = (props: IGanttProps, ref) => {
     console.log('task[0] - value:', y('0'))
     console.log('task[1] - value:', y('1'))
 
-    g.append('g')
-      .attr('class', 'axis axis--x')
-      .attr('transform', `translate(0, ${height})`)
-      // @ts-ignore
-      .call(genXAxis(x, initialTransform))
+    /**
+     * 画x轴
+     */
+    function renderX(newXScale, newTransform) {
+      const X = svg.select('.axis--x')
+      let selectX: d3.Selection<SVGGElement, unknown, HTMLElement, any>
+      if (X.empty()) {
+        selectX = g
+          .append('g')
+          .attr('class', 'axis axis--x')
+          .attr('transform', `translate(0, ${height})`)
+      } else {
+        selectX = X.attr(
+          'transform',
+          `translate(0, ${height})`
+        ) as d3.Selection<SVGGElement, unknown, HTMLElement, any>
+      }
 
-    const yAxis = g
-      .append('g')
-      .attr('class', 'axis axis--y')
-      .attr('transform', `translate(0, 0)`)
-
-    if (tasks.length > 0) {
       // @ts-ignore
-      yAxis.style('display', 'block').call(genYAxis(tasks, taskLevels))
-    } else {
-      yAxis.style('display', 'none')
+      selectX.call(genXAxis(newXScale, newTransform))
     }
 
-    g.selectAll('.axis--y .tick text').each(function (d, i) {
-      const self = d3.select(this)
-      const text = self.text()
-      const split = text.split(',')
-      if (split.length > 1) {
-        self.text('')
-        split.forEach((t, i) => {
-          self
-            .append('tspan')
-            .attr('x', '-10')
-            .attr('dy', i === 0 ? 0 : '1em')
-            .text(t)
-            .datum({ name: t })
-        })
+    renderX(x, initialTransform)
+
+    /**
+     * 画y轴
+     */
+    function renderY(maxYText: number, tasks: ITask2[], taskLevels: string[]) {
+      const Y = svg.select('.axis--y')
+      let selectY: d3.Selection<SVGGElement, unknown, HTMLElement, any>
+      if (Y.empty()) {
+        selectY = g
+          .append('g')
+          .attr('class', 'axis axis--y')
+          .attr('transform', `translate(${maxYText}, 0)`)
+      } else {
+        selectY = Y.attr(
+          'transform',
+          `translate(${maxYText}, 0)`
+        ) as d3.Selection<SVGGElement, unknown, HTMLElement, any>
       }
-    })
+
+      if (tasks.length > 0) {
+        // @ts-ignore
+        selectY.style('display', 'block').call(genYAxis(tasks, taskLevels))
+      } else {
+        selectY.style('display', 'none')
+      }
+    }
+
+    renderY(maxYText, tasks, taskLevels)
+
+    /**
+     * 设置y轴text是否需要分隔成多行
+     */
+    function setYTextSpan() {
+      g.selectAll('.axis--y .tick text').each(function (d, i) {
+        const self = d3.select(this)
+        const text = self.text()
+        const split = text.split(',')
+        if (split.length > 1) {
+          self.text('')
+          split.forEach((t, i) => {
+            self
+              .append('tspan')
+              .attr('x', '-10')
+              .attr('dy', i === 0 ? 0 : '1em')
+              .text(t)
+              .datum({ name: t })
+          })
+        }
+      })
+    }
+
+    setYTextSpan()
 
     renderTodayRect()
 
@@ -664,40 +718,14 @@ const Gantt = (props: IGanttProps, ref) => {
       // console.log('transform:', newTransform)
 
       const { filterTasks, taskLevels } = getFilterTasks(newXScale, tasks)
+      maxYText = getMaxYTextByTasks(filterTasks)
 
-      // 更新x轴
-      svg
-        .select('.axis--x')
-        // @ts-ignore
-        .call(genXAxis(newXScale, newTransform))
+      newXScale = newXScale.rangeRound([maxYText, width])
+      // 更新x轴和y轴
+      renderX(newXScale, newTransform)
+      renderY(maxYText, filterTasks, taskLevels)
 
-      if (filterTasks.length > 0) {
-        // 更新y轴
-        svg
-          .select('.axis--y')
-          .style('display', 'block')
-          // @ts-ignore
-          .call(genYAxis(filterTasks, taskLevels))
-      } else {
-        svg.select('.axis--y').style('display', 'none')
-      }
-
-      g.selectAll('.axis--y .tick text').each(function (d, i) {
-        const self = d3.select(this)
-        const text = self.text()
-        const split = text.split(',')
-        if (split.length > 1) {
-          self.text('')
-          split.forEach((t, i) => {
-            self
-              .append('tspan')
-              .attr('x', '-10')
-              .attr('dy', i === 0 ? '0' : '1em')
-              .text(t)
-              .datum({ name: t })
-          })
-        }
-      })
+      setYTextSpan()
 
       renderTodayRect()
 
@@ -760,7 +788,8 @@ const Gantt = (props: IGanttProps, ref) => {
                 : t.endTime
             )
               .add(offsetDate, 'day')
-              .toDate()
+              .toDate(),
+            newXScale
           )
         )
         // 如果点击的是不同的柱子，则高亮柱子

@@ -19,3 +19,11 @@ export const base64_to_utf8 = (str: string) => {
 export const toUnicode = (str) => {
   return escape(str).replace(/%u/gi, '\\u')
 }
+
+export function getTextWidth(text: string, font: string, offset = 10) {
+  const canvas = document.createElement('canvas')
+  const context = canvas.getContext('2d')
+  context!.font = font
+  const width = context!.measureText(text).width
+  return width + offset
+}

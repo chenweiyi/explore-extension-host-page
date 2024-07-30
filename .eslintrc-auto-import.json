@@ -130,6 +130,7 @@
     "SyncOutlined": true,
     "DeleteOutlined": true,
     "ExclamationCircleOutlined": true,
-    "ADrawer": true
+    "ADrawer": true,
+    "getTextWidth": true
   }
 }

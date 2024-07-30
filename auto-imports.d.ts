@@ -34,6 +34,7 @@ declare global {
   const dayjs: typeof import('@utils/special/dayjs')['dayjs']
   const forwardRef: typeof import('react')['forwardRef']
   const getLanguage: typeof import('./utils/locale-util')['getLanguage']
+  const getTextWidth: typeof import('./utils/tool')['getTextWidth']
   const isNil: typeof import('lodash-es')['isNil']
   const kebabCase: typeof import('./utils/antd-resolver')['kebabCase']
   const lazy: typeof import('react')['lazy']
