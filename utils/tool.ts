@@ -27,3 +27,16 @@ export function getTextWidth(text: string, font: string, offset = 10) {
   const width = context!.measureText(text).width
   return width + offset
 }
+
+export function getScreenSpecification() {
+  const screenWidth = document.documentElement.clientWidth
+  if (screenWidth < 1300) {
+    return 'small'
+  } else if (screenWidth <= 1600) {
+    return 'middle'
+  } else if (screenWidth <= 2000) {
+    return 'default'
+  } else {
+    return 'large'
+  }
+}

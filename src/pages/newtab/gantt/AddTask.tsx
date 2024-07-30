@@ -133,6 +133,7 @@ const AddTask = (props: IAddTaskProps) => {
         initialValues={initialValues}
         labelCol={{ span: 6 }}
         labelAlign='right'
+        wrapperCol={{ span: 14, offset: 1 }}
         onFinish={onFinish}
       >
         <AForm.Item

@@ -16,6 +16,7 @@ export enum Features {
 
 const Newtab = () => {
   const [feature, setFeature] = useState(Features[0])
+  const [showToolBar, setShowToolBar] = useState(true)
   // 一句话
   const [showOneWord, setShowOneWord] = useState(true)
 
@@ -79,6 +80,7 @@ const Newtab = () => {
           transition-all 
           hover:box-shadow-sample-hover
         '
+          style={{ display: showToolBar ? 'flex' : 'none' }}
         >
           <ATooltip title={t('type_tab')} placement='right'>
             <IMdiStarBoxOutline
@@ -107,7 +109,9 @@ const Newtab = () => {
           </ATooltip>
         </div>
         {feature === Features[0] && <Tab />}
-        {feature === Features[1] && <Calendar />}
+        {feature === Features[1] && (
+          <Calendar setShowToolBar={setShowToolBar} />
+        )}
       </div>
     </AConfigProvider>
   )

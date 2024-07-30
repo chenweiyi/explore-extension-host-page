@@ -131,6 +131,7 @@
     "DeleteOutlined": true,
     "ExclamationCircleOutlined": true,
     "ADrawer": true,
-    "getTextWidth": true
+    "getTextWidth": true,
+    "getScreenSpecification": true
   }
 }

@@ -123,6 +123,8 @@
 .bg-gradient-to-r{--un-gradient-shape:to right;--un-gradient:var(--un-gradient-shape), var(--un-gradient-stops);background-image:linear-gradient(var(--un-gradient));}
 .p-\[16px\]{padding:16px;}
 .p-\[4px\]{padding:4px;}
+.px,
+[px=""]{padding-left:1rem;padding-right:1rem;}
 .px-\[12px\]{padding-left:12px;padding-right:12px;}
 .px-\[16px\]{padding-left:16px;padding-right:16px;}
 .px-\[32px\]{padding-left:32px;padding-right:32px;}
@@ -134,13 +136,10 @@
 .py-\[40px\]{padding-top:40px;padding-bottom:40px;}
 .py-\[4px\]{padding-top:4px;padding-bottom:4px;}
 .py-20px{padding-top:20px;padding-bottom:20px;}
-[px=""]{padding-left:1rem;padding-right:1rem;}
 .pl-\[12px\]{padding-left:12px;}
 .pl-\[24px\]{padding-left:24px;}
-.pl-120px{padding-left:120px;}
 .pl-20px{padding-left:20px;}
 .pl-40px{padding-left:40px;}
-.pr-40px{padding-right:40px;}
 .pt-\[12px\]{padding-top:12px;}
 .pt-14px{padding-top:14px;}
 .text-wrap{text-wrap:wrap;}

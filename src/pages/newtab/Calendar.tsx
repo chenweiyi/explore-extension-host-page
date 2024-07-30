@@ -7,6 +7,10 @@ import { message, Modal } from 'antd'
 // import demoData from './data'
 import { regenTasks } from './gantt/util'
 
+export type ICalendarProps = {
+  setShowToolBar: (showToolBar: boolean) => void
+}
+
 export type IShowType = '' | 'add' | 'edit' | 'analysis' | 'refresh' | 'delete'
 export type IOriTask = Omit<ITask, 'children' | 'level' | 'status'> & {
   color?: string
@@ -25,12 +29,24 @@ export const colors = [
   '#F4DBC6',
   '#F2CADA'
 ]
-const activeColor = '#95d475'
-const defaultColor = '#FD6585'
+
 const defaultBlockColor = '#e9e9eb'
 const STORAGE_GANTT_KEY = 'gantt-tasks'
 
-const Calendar = () => {
+function getDrawerWidth() {
+  const screenSpecification = getScreenSpecification()
+  if (screenSpecification === 'small') {
+    return 350
+  } else if (screenSpecification === 'middle') {
+    return 450
+  } else if (screenSpecification === 'default') {
+    return 600
+  }
+  return 700
+}
+
+const Calendar = (props: ICalendarProps) => {
+  const { setShowToolBar } = props
   const [svgWidth, setSvgWidth] = useState(800)
   const [svgHeight, setSvgHeight] = useState(400)
   const [showType, setShowType] = useState<IShowType>('')
@@ -44,6 +60,7 @@ const Calendar = () => {
   const [activeTask, setActiveTask] = useState<IOriTask | null>(null)
   const commingThreshold = 2
   const expiringThreshold = 2
+  const drawerWidth = getDrawerWidth()
 
   function clickTaskHandle(t) {
     ganttRef.current?.jumpToTask(t)
@@ -171,6 +188,14 @@ const Calendar = () => {
     }
   }, [showType])
 
+  useUpdateEffect(() => {
+    if (drawerOpen) {
+      setShowToolBar(false)
+    } else {
+      setShowToolBar(true)
+    }
+  }, [drawerOpen])
+
   useEffect(() => {
     console.log('calendar init...')
     chrome.storage.sync.get([STORAGE_GANTT_KEY], (result) => {
@@ -182,7 +207,17 @@ const Calendar = () => {
   }, [])
 
   return (
-    <div className='flex flex-wrap w-full h-full pl-120px pr-40px items-center justify-center'>
+    <div
+      className={clsx(
+        'flex',
+        'flex-wrap',
+        'w-full',
+        'h-full',
+        'items-center',
+        'justify-center'
+      )}
+      style={{ marginRight: drawerOpen ? `${drawerWidth}px` : '0px' }}
+    >
       <div className='calendar-container w-800px h-400px my-40px relative'>
         <Gantt
           ref={ganttRef}
@@ -197,7 +232,7 @@ const Calendar = () => {
         title={drawerTitle}
         open={drawerOpen}
         onClose={closeDrawer}
-        width={600}
+        width={drawerWidth}
         destroyOnClose={true}
       >
         {showType === 'add' && <AddTask type={showType} addTask={addTask} />}
