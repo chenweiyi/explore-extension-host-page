@@ -572,10 +572,10 @@ const Gantt = (props: IGanttProps, ref) => {
       .domain(taskLevels)
     newYScale = y
 
-    console.log('0 -> time:', x.invert(0))
-    console.log('end -> time:', x.invert(width))
-    console.log('task[0] - value:', y('0'))
-    console.log('task[1] - value:', y('1'))
+    // console.log('0 -> time:', x.invert(0))
+    // console.log('end -> time:', x.invert(width))
+    // console.log('task[0] - value:', y('0'))
+    // console.log('task[1] - value:', y('1'))
 
     /**
      * 画x轴
@@ -705,8 +705,8 @@ const Gantt = (props: IGanttProps, ref) => {
       }
     }
 
-    function getFilterTasks(x, tasks: ITask2[]) {
-      const st = x.invert(0)
+    function getFilterTasks(x, tasks: ITask2[], xmin: number) {
+      const st = x.invert(xmin)
       const et = x.invert(width)
       const filterTasks: ITask2[] = tasks.filter((t) => {
         if (!t.children || t.children.length === 0) {
@@ -726,14 +726,17 @@ const Gantt = (props: IGanttProps, ref) => {
     }
 
     function zoomed(event) {
-      newXScale = event.transform.rescaleX(x)
+      newXScale = event.transform.rescaleX(x).rangeRound([maxYText, width])
       newTransform = event.transform
       // console.log('transform:', newTransform)
 
-      const { filterTasks, taskLevels } = getFilterTasks(newXScale, tasks)
+      const { filterTasks, taskLevels } = getFilterTasks(
+        newXScale,
+        tasks,
+        maxYText
+      )
       maxYText = getMaxYTextByTasks(filterTasks)
 
-      newXScale = newXScale.rangeRound([maxYText, width])
       // 更新x轴和y轴
       renderX(newXScale, newTransform)
       renderY(maxYText, filterTasks, taskLevels)
