@@ -164,6 +164,16 @@ const Gantt = (props: IGanttProps, ref) => {
     const width = +svg.attr('width') - margin.left - margin.right
     const height = +svg.attr('height') - margin.top - margin.bottom
 
+    svg
+      .append('defs')
+      .append('clipPath')
+      .attr('id', 'clip-bar')
+      .append('rect')
+      .attr('x', maxYText)
+      .attr('y', margin.top)
+      .attr('width', width - maxYText)
+      .attr('height', height)
+
     // const minTime = dayjs(d3.min(tasks, (t) => t.startTime))
     //   .subtract(offsetDate, 'day')
     //   .toDate()
@@ -523,6 +533,7 @@ const Gantt = (props: IGanttProps, ref) => {
         .attr('width', newXScale(todayEnd) - newXScale(todayStart))
         .attr('height', height)
         .attr('fill', todayColor)
+        .attr('clip-path', 'url(#clip-bar)')
 
       g.selectAll('.today-text')
         .data([{ todayStart, todayEnd }])
@@ -539,6 +550,7 @@ const Gantt = (props: IGanttProps, ref) => {
         .style('font-size', '10px')
         .attr('writing-mode', 'vertical-lr')
         .attr('letter-spacing', '4')
+        .attr('clip-path', 'url(#clip-bar)')
     }
 
     const g = svg
@@ -649,7 +661,8 @@ const Gantt = (props: IGanttProps, ref) => {
         .data(tasks)
         .enter()
         .append('g')
-        .attr('class', 'bar-group'),
+        .attr('class', 'bar-group')
+        .attr('clip-path', 'url(#clip-bar)'),
       x,
       y,
       initialTransform
@@ -737,8 +750,13 @@ const Gantt = (props: IGanttProps, ref) => {
       barGroup.exit().remove()
 
       modifyBarGroupAttr(
-        // @ts-ignore
-        barGroup.enter().append('g').attr('class', 'bar-group').merge(barGroup),
+        barGroup
+          .enter()
+          .append('g')
+          .attr('class', 'bar-group')
+          .attr('clip-path', 'url(#clip-bar)')
+          // @ts-ignore
+          .merge(barGroup),
         newXScale,
         newYScale,
         newTransform
