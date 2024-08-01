@@ -3,7 +3,9 @@ import 'dayjs/locale/zh-cn'
 import isBetween from 'dayjs/plugin/isBetween'
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
+import utc from 'dayjs/plugin/utc'
 
+dayjs.extend(utc)
 dayjs.extend(isBetween)
 dayjs.extend(isSameOrBefore)
 dayjs.extend(isSameOrAfter)
@@ -50,6 +52,18 @@ type ILikeTask2 = {
 }
 
 export const dateFormat = 'YYYY-MM-DD'
+
+export const calcCenterDate = (
+  startTime: string | Date,
+  endTime: string | Date
+) => {
+  const start = dayjs.utc(startTime)
+  const end = dayjs.utc(endTime)
+  const timestamp1 = start.valueOf()
+  const timestamp2 = end.valueOf()
+  const midTimestamp = (timestamp1 + timestamp2) / 2
+  return dayjs(midTimestamp).toDate()
+}
 
 /**
  * 获取所给任务的最大，最小时间

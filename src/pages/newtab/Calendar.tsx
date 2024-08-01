@@ -62,7 +62,7 @@ const Calendar = (props: ICalendarProps) => {
   const expiringThreshold = 2
   const drawerWidth = getDrawerWidth()
 
-  function clickTaskHandle(t) {
+  function clickTaskHandle(t: ITask) {
     ganttRef.current?.jumpToTask(t)
   }
 
@@ -155,14 +155,14 @@ const Calendar = (props: ICalendarProps) => {
       expiringThreshold
     })
     setTasks(tasks)
-    ganttRef.current?.refresh?.({
+    ganttRef.current?.refreshChart?.({
       tasks
     })
   }, [oriTasks])
 
   useEffect(() => {
     if (showType === 'refresh') {
-      ganttRef.current?.refresh()
+      ganttRef.current?.refreshChart()
       setShowType('')
     } else if (showType === 'delete') {
       Modal.confirm({
@@ -234,6 +234,7 @@ const Calendar = (props: ICalendarProps) => {
         onClose={closeDrawer}
         width={drawerWidth}
         destroyOnClose={true}
+        mask={false}
       >
         {showType === 'add' && <AddTask type={showType} addTask={addTask} />}
         {showType === 'edit' && (
