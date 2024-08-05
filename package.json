@@ -9,7 +9,8 @@
   },
   "scripts": {
     "cz": "cz",
-    "build": "tsc --noEmit && vite build && pnpm run zip",
+    "tsc": "tsc --noEmit",
+    "build": "vite build && pnpm run zip",
     "build:firefox": "tsc --noEmit && cross-env __FIREFOX__=true vite build",
     "build:dev": "cross-env __DEV__=true vite build",
     "build:firefox:watch": "cross-env __DEV__=true __FIREFOX__=true vite build -w",

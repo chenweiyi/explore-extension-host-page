@@ -1,9 +1,9 @@
 import { colors } from './Calendar'
-import { ITask } from './gantt/Gantt'
+import { ITask, ITask2 } from './gantt/Gantt'
 
 const defaultBlockColor = '#e9e9eb'
 
-const tasks: ITask[] = [
+const tasks: ITask2[] = [
   {
     name: 'task1',
     color: colors[0],
