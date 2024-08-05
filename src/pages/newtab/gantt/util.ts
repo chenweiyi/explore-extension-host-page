@@ -4,6 +4,7 @@ import isBetween from 'dayjs/plugin/isBetween'
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter'
 import utc from 'dayjs/plugin/utc'
+import type { Dayjs } from 'dayjs'
 
 dayjs.extend(utc)
 dayjs.extend(isBetween)
@@ -35,9 +36,11 @@ export type IGenLevelTask = Omit<ITask, 'status'>
 export type ILikeTask = {
   startTime: string | Date
   endTime: string | Date
+  [str: string]: any
   children?: Array<{
     startTime: string | Date
     endTime: string | Date
+    [str: string]: any
   }>
 }
 
@@ -53,6 +56,9 @@ type ILikeTask2 = {
 
 export const dateFormat = 'YYYY-MM-DD'
 
+/**
+ * 计算返回任务的中心时间
+ */
 export const calcCenterDate = (
   startTime: string | Date,
   endTime: string | Date
@@ -311,6 +317,9 @@ export const splitAvaliableTimes = (
   return arr
 }
 
+/**
+ * 判断任务A是否包含B
+ */
 export const AIncludeB = (a: ILikeTask, b: ILikeTask) => {
   const { min: minA, max: maxA } = getTaskMinMax(a)
   const { min: minB, max: maxB } = getTaskMinMax(b)
@@ -320,6 +329,9 @@ export const AIncludeB = (a: ILikeTask, b: ILikeTask) => {
   )
 }
 
+/**
+ * 判断任务A是否包含多个任务集合B
+ */
 export const AIncludeBS = (a: ILikeTask, bs: ILikeTask[]) => {
   let flag = true
   const { min: minA, max: maxA } = getTaskMinMax(a)
@@ -336,6 +348,29 @@ export const AIncludeBS = (a: ILikeTask, bs: ILikeTask[]) => {
     }
   }
   return flag
+}
+
+/**
+ * 获取在时间范围内的任务集合
+ */
+export const getTasksInTimeScope = (
+  tasks: ILikeTask[],
+  startTime: string | Date | Dayjs,
+  endTime: string | Date | Dayjs
+) => {
+  const arr: ILikeTask[] = []
+  tasks.forEach((task) => {
+    const { min, max } = getTaskMinMax(task)
+    if (
+      !(
+        dayjs(max).isSameOrBefore(dayjs(startTime)) &&
+        dayjs(min).isSameOrAfter(dayjs(endTime))
+      )
+    ) {
+      arr.push(task)
+    }
+  })
+  return arr
 }
 
 /**

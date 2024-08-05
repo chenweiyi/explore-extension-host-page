@@ -1,5 +1,5 @@
 import * as d3 from 'd3'
-import { calcCenterDate, getTaskMinMax, simpleCopy } from './util'
+import { getTaskMinMax, getTasksInTimeScope, simpleCopy } from './util'
 
 export type IStatus = Array<
   | 'doing'
@@ -49,6 +49,7 @@ export type ITask2 = Omit<ITask, 'children' | 'startTime' | 'endTime'> & {
 
 export type IGanttProps = {
   tasks: ITask[]
+  task?: ITask
   width: number
   height: number
   startTime?: string
@@ -61,7 +62,7 @@ const Gantt = (props: IGanttProps, ref) => {
   const svgBgColor = '#f4f4f5'
   const barHeight = 30
   const barPadding = 30
-  const offsetDate = 2
+  const offsetDate = 7
   const textColor = 'black'
   const textFontSize = '10px'
   const textFontFamily = 'sans-serif'
@@ -75,8 +76,6 @@ const Gantt = (props: IGanttProps, ref) => {
   const scaleExtent: [number, number] = [0.2, 15]
 
   const svgRef = useRef(null)
-  const jumpToTaskRef = useRef(null)
-
   function getIntervalNum(transform) {
     if (transform.k >= 1) {
       return 1
@@ -130,6 +129,7 @@ const Gantt = (props: IGanttProps, ref) => {
   function renderChart(props: IGanttProps) {
     const {
       tasks: _tasks,
+      task: _task,
       startTime: _startTime,
       endTime: _endTime,
       onSvgDblClick,
@@ -144,20 +144,50 @@ const Gantt = (props: IGanttProps, ref) => {
     let newTransform
 
     const tasks = transformTasks(_tasks)
-    const startTime = dayjs(
-      _startTime || dayjs().subtract(7, 'day').startOf('day')
-    ).toDate()
-    const endTime = dayjs(
-      _endTime || dayjs().add(7, 'day').startOf('day')
-    ).toDate()
-    let taskLevels = [...new Set(tasks.map((t) => t.level + ''))]
-    let maxYText = getMaxYTextByTasks(tasks)
-    // const startTime = dayjs(d3.min(tasks, (t) => t.startTime))
-    //   .subtract(offsetDate, 'day')
-    //   .toDate()
-    // const endTime = dayjs(d3.max(tasks, (t) => t.endTime))
-    //   .add(offsetDate, 'day')
-    //   .toDate()
+    function getTimeScope(params: {
+      task?: ITask
+      startTime?: string
+      endTime?: string
+      offset: number
+    }) {
+      if (params.task) {
+        const task = tasks.find((t) => t.name === params.task.name)
+        const { min, max } = getTaskMinMax(task)
+        return {
+          startTime: dayjs(min)
+            .subtract(params.offset, 'day')
+            .startOf('day')
+            .toDate(),
+          endTime: dayjs(max).add(params.offset, 'day').startOf('day').toDate()
+        }
+      } else {
+        return {
+          startTime: dayjs(
+            params.startTime ||
+              dayjs().subtract(params.offset, 'day').startOf('day')
+          ).toDate(),
+          endTime: dayjs(
+            params.endTime || dayjs().add(params.offset, 'day').startOf('day')
+          ).toDate()
+        }
+      }
+    }
+
+    const { startTime, endTime } = getTimeScope({
+      task: _task,
+      startTime: _startTime,
+      endTime: _endTime,
+      offset: offsetDate
+    })
+    console.log('startTime:', startTime)
+    console.log('endTime:', endTime)
+    const filterTasks = getTasksInTimeScope(
+      tasks,
+      startTime,
+      endTime
+    ) as ITask2[]
+    let taskLevels = [...new Set(filterTasks.map((t) => t.level + ''))]
+    let maxYText = getMaxYTextByTasks(filterTasks)
 
     // 清除旧的SVG图形
     d3.select('.calendar-container .gantt-container').remove()
@@ -182,15 +212,16 @@ const Gantt = (props: IGanttProps, ref) => {
       .attr('width', width - maxYText)
       .attr('height', height)
 
-    // const minTime = dayjs(d3.min(tasks, (t) => t.startTime))
-    //   .subtract(offsetDate, 'day')
-    //   .toDate()
-    // const maxTime = dayjs(d3.max(tasks, (t) => t.endTime))
-    //   .add(offsetDate, 'day')
-    //   .toDate()
-
-    function genTransform(st, et, x: d3.ScaleTime<number, number, never>) {
-      return d3.zoomIdentity.scale(width / (x(et) - x(st))).translate(-x(st), 0)
+    function genTransform(
+      st,
+      et,
+      x: d3.ScaleTime<number, number, never>,
+      width: number,
+      offset: number
+    ) {
+      return d3.zoomIdentity
+        .scale((width - offset) / (x(et) - x(st)))
+        .translate(-(x(st) - offset), 0)
     }
 
     // 创建初始化x轴缩放比例
@@ -199,7 +230,13 @@ const Gantt = (props: IGanttProps, ref) => {
       .domain([startTime, endTime])
       .rangeRound([maxYText, width])
 
-    const initialTransform = genTransform(startTime, endTime, initialXScale)
+    const initialTransform = genTransform(
+      startTime,
+      endTime,
+      initialXScale,
+      width,
+      maxYText
+    )
     newTransform = initialTransform
 
     console.log('initialTransform:', initialTransform)
@@ -635,7 +672,7 @@ const Gantt = (props: IGanttProps, ref) => {
       }
     }
 
-    renderY(maxYText, tasks, taskLevels)
+    renderY(maxYText, filterTasks, taskLevels)
 
     /**
      * 设置y轴text是否需要分隔成多行
@@ -666,7 +703,7 @@ const Gantt = (props: IGanttProps, ref) => {
     modifyBarGroupAttr(
       g
         .selectAll('.bar-group')
-        .data(tasks)
+        .data(filterTasks)
         .enter()
         .append('g')
         .attr('class', 'bar-group')
@@ -802,64 +839,18 @@ const Gantt = (props: IGanttProps, ref) => {
       })
       // @ts-ignore
       .call(zoom.transform, initialTransform)
-
-    function jumpToTask(t: ITask) {
-      console.log('tasks:', tasks)
-      console.log('maxYText:', maxYText)
-      console.log('width:', width)
-      console.log('newXScale domain:', newXScale.domain())
-      console.log('newXScale range:', newXScale.range())
-      console.log('newTransform:', newTransform)
-      const { min: _min, max: _max } = getTaskMinMax(t)
-      const min = dayjs(_min).startOf('day').toDate()
-      const max = dayjs(_max).startOf('day').toDate()
-
-      console.log('newXScale(min):', newXScale(min))
-      console.log('newXScale(max):', newXScale(max))
-
-      // 任务的中心点
-      const centre = (newXScale(min) + newXScale(max)) / 2
-      console.log('centre:', centre)
-      console.log('center -> time:', newXScale.invert(centre))
-      // 计算x轴中间的位置
-      const xMiddle = (width - maxYText) / 2 + maxYText
-      console.log('xMiddle:', xMiddle)
-      // 计算需要平移的距离
-      let translateX = xMiddle - centre
-      console.log('translateX:', translateX)
-      // 计算缩放级别
-      let scale = (width - maxYText) / ((newXScale(max) - newXScale(min)) * 4)
-      console.log('scale:', scale)
-      const scaleExtent = zoom.scaleExtent()
-      // 限制缩放级别在scaleExtent的范围内
-      scale = Math.max(scaleExtent[0], Math.min(scale, scaleExtent[1]))
-      console.log('scale value:', scale)
-      // 去除缩放后的平移变化
-      translateX = translateX / newTransform.k
-      // console.log('scale translateX:', translateX)
-      // 创建一个新的转换
-      // const transformx = d3.zoomIdentity.scale(1).translate(translateX, 0)
-      // 基于原有的转换进行变换
-      newTransform = newTransform.scale(1).translate(translateX, 0)
-      // 应用新的转换到svg元素
-      // svg.transition().duration(750).call(zoom.transform, transformx)
-      svg.call(zoom.transform, newTransform)
-      setTimeout(() => {
-        const date = calcCenterDate(min, max)
-        console.log('center date:', date)
-        console.log('clac center pos:', newXScale(date))
-      }, 200)
-    }
-
-    jumpToTaskRef.current = jumpToTask
   }
 
   function refreshChart(options: { tasks: ITask[] }) {
     renderChart({ ...props, ...options })
   }
 
+  function jumpToTask(options: { task: ITask }) {
+    renderChart({ ...props, ...options })
+  }
+
   useImperativeHandle(ref, () => ({
-    jumpToTask: jumpToTaskRef.current,
+    jumpToTask: jumpToTask,
     refreshChart: refreshChart
   }))
 
