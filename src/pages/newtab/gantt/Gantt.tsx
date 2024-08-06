@@ -77,9 +77,9 @@ const Gantt = (props: IGanttProps, ref) => {
 
   const svgRef = useRef(null)
   function getIntervalNum(transform) {
-    if (transform.k >= 1) {
+    if (transform.k > 1.1) {
       return 1
-    } else if (transform.k >= 0.8 && transform.k < 1) {
+    } else if (transform.k >= 0.8 && transform.k <= 1.2) {
       return 2
     } else if (transform.k >= 0.6 && transform.k < 0.8) {
       return 3
@@ -213,12 +213,14 @@ const Gantt = (props: IGanttProps, ref) => {
       .attr('height', height)
 
     function genTransform(
-      st,
-      et,
+      st: Date,
+      et: Date,
       x: d3.ScaleTime<number, number, never>,
       width: number,
       offset: number
     ) {
+      // console.log('et - st = ? day:', dayjs(et).diff(dayjs(st), 'day'))
+      // const scaleNum = maxXDays / dayjs(et).diff(dayjs(st), 'day')
       return d3.zoomIdentity
         .scale((width - offset) / (x(et) - x(st)))
         .translate(-(x(st) - offset), 0)
@@ -309,6 +311,9 @@ const Gantt = (props: IGanttProps, ref) => {
         )
         .style('fill', hoverTickFillColor)
         .style('font-size', hoverTickFontSize)
+        .text(function (d: { time: Date }) {
+          return d3.timeFormat('%Y-%m-%d')(d.time)
+        })
 
       // y轴标签样式
       let yTextOrSpan = d3
@@ -380,6 +385,9 @@ const Gantt = (props: IGanttProps, ref) => {
         )
         .style('fill', textColor)
         .style('font-size', textFontSize)
+        .text(function (d: { time: Date }) {
+          return d3.timeFormat('%m-%d')(d.time)
+        })
 
       // 还原y轴标签样式
       // y轴标签样式
@@ -517,10 +525,10 @@ const Gantt = (props: IGanttProps, ref) => {
           // @ts-ignore
           tickFormat ||
             function (val, index) {
-              const labelText =
-                index === 0
-                  ? d3.timeFormat('%Y-%m-%d')(val as Date)
-                  : d3.timeFormat('%m-%d')(val as Date)
+              const labelText = d3.timeFormat('%m-%d')(val as Date)
+              // index === 0
+              // ? d3.timeFormat('%Y-%m-%d')(val as Date)
+              // : d3.timeFormat('%m-%d')(val as Date)
               // 设置text文字样式
               d3.select(this)
                 .style('fill', textColor)
