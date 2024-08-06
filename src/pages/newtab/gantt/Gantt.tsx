@@ -50,6 +50,7 @@ export type ITask2 = Omit<ITask, 'children' | 'startTime' | 'endTime'> & {
 export type IGanttProps = {
   tasks: ITask[]
   task?: ITask
+  highlightTask?: ITask
   width: number
   height: number
   startTime?: string
@@ -76,6 +77,8 @@ const Gantt = (props: IGanttProps, ref) => {
   const scaleExtent: [number, number] = [0.2, 15]
 
   const svgRef = useRef(null)
+  const hightBarGroupRef = useRef(null)
+
   function getIntervalNum(transform) {
     if (transform.k > 1.1) {
       return 1
@@ -130,6 +133,7 @@ const Gantt = (props: IGanttProps, ref) => {
     const {
       tasks: _tasks,
       task: _task,
+      highlightTask: _highlightTask,
       startTime: _startTime,
       endTime: _endTime,
       onSvgDblClick,
@@ -337,6 +341,8 @@ const Gantt = (props: IGanttProps, ref) => {
           .style('font-size', hoverTickFontSize)
       }
     }
+
+    hightBarGroupRef.current = highlightBar
 
     /**
      * 清除柱子的高亮样式
@@ -847,6 +853,26 @@ const Gantt = (props: IGanttProps, ref) => {
       })
       // @ts-ignore
       .call(zoom.transform, initialTransform)
+
+    setTimeout(() => {
+      if (_highlightTask) {
+        const _highlightTask2 = tasks.find(
+          (t) => t.name === _highlightTask.name
+        )
+        if (_highlightTask2) {
+          barClickHandler(
+            null,
+            _highlightTask2,
+            newXScale,
+            newYScale,
+            newTransform
+          )
+          if (!(activeData && activeData.name === _highlightTask2.name)) {
+            activeData = _highlightTask2
+          }
+        }
+      }
+    }, 100)
   }
 
   function refreshChart(options: { tasks: ITask[] }) {

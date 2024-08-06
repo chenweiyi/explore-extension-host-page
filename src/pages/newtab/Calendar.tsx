@@ -63,7 +63,7 @@ const Calendar = (props: ICalendarProps) => {
   const drawerWidth = getDrawerWidth()
 
   function clickTaskHandle(t: ITask) {
-    ganttRef.current?.jumpToTask({ task: t })
+    ganttRef.current?.jumpToTask({ task: t, highlightTask: t })
   }
 
   function addTask(t: IOriTask) {
