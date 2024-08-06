@@ -172,7 +172,7 @@ const AddTask = (props: IAddTaskProps) => {
         <AForm.Item label='任务描述：' name='desc'>
           <AInput.TextArea placeholder='请输入任务描述' />
         </AForm.Item>
-        <AForm.Item wrapperCol={{ span: 18, offset: 6 }}>
+        <AForm.Item wrapperCol={{ span: 18, offset: 7 }}>
           <AButton type='primary' htmlType='submit'>
             {type === 'add' ? '保存' : '更新'}
           </AButton>
