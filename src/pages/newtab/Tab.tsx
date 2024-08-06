@@ -44,6 +44,13 @@ export enum Classes {
 
 export type ICategoryDataMap = Map<ICategoryKey, ICategoryKey[]>
 
+export function faviconURL(pageUrl: string, pageSize = 16) {
+  const url = new URL(chrome.runtime.getURL('/_favicon/'))
+  url.searchParams.set('pageUrl', pageUrl)
+  url.searchParams.set('size', pageSize + '')
+  return url.toString()
+}
+
 const Tab = () => {
   const [activeClass, setActiveClass] = useState(Classes[0])
   // key: 文件夹 value: 文件夹下的文件

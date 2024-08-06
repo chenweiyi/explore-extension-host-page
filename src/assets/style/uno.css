@@ -28,6 +28,7 @@
 .top-0{top:0;}
 .z-10{z-index:10;}
 .grid{display:grid;}
+.col-span-3{grid-column:span 3/span 3;}
 .auto-rows-\[128px\]{grid-auto-rows:128px;}
 .grid-rows-\[128px\]{grid-template-rows:128px;}
 .grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr));}
@@ -46,7 +47,8 @@
 .mr-\[12px\]{margin-right:12px;}
 .mr-\[20px\]{margin-right:20px;}
 .mr-\[4px\]{margin-right:4px;}
-.mr-\[8px\]{margin-right:8px;}
+.mr-\[8px\],
+.mr-8px{margin-right:8px;}
 .mt-\[4px\]{margin-top:4px;}
 .mt-\[8px\]{margin-top:8px;}
 .block{display:block;}
@@ -57,6 +59,7 @@
 .h-\[7\.5\%\]{height:7.5%;}
 .h-\[72px\]{height:72px;}
 .h-\[85\%\]{height:85%;}
+.h-16px{height:16px;}
 .h-200px{height:200px;}
 .h-400px{height:400px;}
 .h-full{height:100%;}
@@ -64,6 +67,7 @@
 .w-\[300px\]{width:300px;}
 .w-\[600px\]{width:600px;}
 .w-\[80\%\]{width:80%;}
+.w-16px{width:16px;}
 .w-30px{width:30px;}
 .w-60px{width:60px;}
 .w-800px{width:800px;}
