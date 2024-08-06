@@ -41,7 +41,7 @@ const TaskList = (props: IAnalysisProps) => {
       ))}
     </ul>
   ) : (
-    <div className='pl-40px pt-14px'>暂无数据</div>
+    <div className='pl-40px pt-14px'>{t('no_data')}</div>
   )
 }
 
@@ -51,7 +51,7 @@ const Analysis = (props: IAnalysisProps) => {
   const _tabItems = [
     {
       key: 'doing',
-      label: '正在进行',
+      label: t('doing'),
       children: (
         <TaskList
           tasks={props.tasks.filter((t) => t.status.includes('doing'))}
@@ -61,7 +61,7 @@ const Analysis = (props: IAnalysisProps) => {
     },
     {
       key: 'blocking',
-      label: '阻塞中',
+      label: t('blocking'),
       children: (
         <TaskList
           tasks={props.tasks.filter((t) => t.status.includes('blocking'))}
@@ -71,7 +71,7 @@ const Analysis = (props: IAnalysisProps) => {
     },
     {
       key: 'coming-soon',
-      label: '即将开始',
+      label: t('coming_soon'),
       children: (
         <TaskList
           tasks={props.tasks.filter((t) => t.status.includes('coming-soon'))}
@@ -81,7 +81,7 @@ const Analysis = (props: IAnalysisProps) => {
     },
     {
       key: 'expiring-soon',
-      label: '即将过期',
+      label: t('expiring_soon'),
       children: (
         <TaskList
           tasks={props.tasks.filter((t) => t.status.includes('expiring-soon'))}
@@ -91,7 +91,7 @@ const Analysis = (props: IAnalysisProps) => {
     },
     {
       key: 'expired',
-      label: '已过期',
+      label: t('expired'),
       children: (
         <TaskList
           tasks={props.tasks.filter((t) => t.status.includes('expired'))}
@@ -101,7 +101,7 @@ const Analysis = (props: IAnalysisProps) => {
     },
     {
       key: 'unstart',
-      label: '未开始',
+      label: t('unstart'),
       children: (
         <TaskList
           tasks={props.tasks.filter((t) => t.status.includes('unstart'))}
@@ -111,7 +111,7 @@ const Analysis = (props: IAnalysisProps) => {
     },
     {
       key: 'delay',
-      label: '延期中',
+      label: t('delay'),
       children: (
         <TaskList
           tasks={props.tasks.filter((t) => t.status.includes('delay'))}
@@ -121,7 +121,7 @@ const Analysis = (props: IAnalysisProps) => {
     },
     {
       key: 'done',
-      label: '已完成',
+      label: t('done'),
       children: (
         <TaskList
           tasks={props.tasks.filter((t) => t.status.includes('done'))}

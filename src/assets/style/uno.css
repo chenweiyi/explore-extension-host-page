@@ -32,6 +32,7 @@
 .auto-rows-\[128px\]{grid-auto-rows:128px;}
 .grid-rows-\[128px\]{grid-template-rows:128px;}
 .grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr));}
+.ma{margin:auto;}
 .mx-4px{margin-left:4px;margin-right:4px;}
 .my-10px{margin-top:10px;margin-bottom:10px;}
 .my-40px{margin-top:40px;margin-bottom:40px;}

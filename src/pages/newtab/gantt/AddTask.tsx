@@ -3,6 +3,7 @@ import { IOriTask } from '../Calendar'
 import { Form } from 'antd'
 import { dateFormat } from './util'
 import { Modal } from 'antd'
+import { NewTabContext } from '../Newtab'
 
 type IAddTaskProps = {
   type?: 'add' | 'edit'
@@ -13,6 +14,7 @@ type IAddTaskProps = {
 }
 
 const AddTask = (props: IAddTaskProps) => {
+  const { locale } = useContext(NewTabContext)
   const { type = 'add', addTask, data, editTask, deleteTask } = props
   const [startTime, setStartTime] = useState('')
   const [endTime, setEndTime] = useState('')
@@ -31,13 +33,13 @@ const AddTask = (props: IAddTaskProps) => {
     name: [
       {
         required: true,
-        message: '请输入任务名称',
+        message: t('input_task_name'),
         trigger: 'blur'
       },
       {
         validator: (rule, value, callback) => {
           if (value.includes(',')) {
-            callback('任务名称不能包含逗号')
+            callback(t('task_name_valid_msg'))
             return
           }
           callback()
@@ -48,12 +50,12 @@ const AddTask = (props: IAddTaskProps) => {
     timescope: [
       {
         required: true,
-        message: '请选择任务周期'
+        message: t('input_task_timescope')
       },
       {
         validator: (rule, value, callback) => {
           if (dayjs(value[0]).isSame(dayjs(value[1]))) {
-            callback('开始时间需小于结束时间')
+            callback(t('task_timescope_valid_msg'))
             return
           }
           callback()
@@ -110,13 +112,18 @@ const AddTask = (props: IAddTaskProps) => {
 
   const onDeleteTask = () => {
     Modal.confirm({
-      title: '提示',
+      title: t('tip'),
       icon: <ExclamationCircleOutlined />,
       centered: true,
-      content: (
+      content: locale.startsWith('zh-') ? (
         <div className='my-10px'>
-          确定要删除任务
-          <span className='mx-4px font-semibold'>{data.name}</span> 吗？
+          {t('task_delete_confirm_content')}
+          <span className='mx-4px font-semibold'>{data.name}</span> {t('ma')}？
+        </div>
+      ) : (
+        <div className='my-10px'>
+          {t('task_delete_confirm_content')}
+          <span className='mx-4px font-semibold'>{data.name}</span> ?
         </div>
       ),
       onOk() {
@@ -137,15 +144,15 @@ const AddTask = (props: IAddTaskProps) => {
         onFinish={onFinish}
       >
         <AForm.Item
-          label='任务名：'
+          label={`${t('task_name')}${locale.startsWith('zh-') ? '：' : ':'}`}
           name='name'
           rules={rules.name}
           validateFirst={true}
         >
-          <AInput placeholder='请输入任务名称' />
+          <AInput placeholder={t('input_task_name')} />
         </AForm.Item>
         <AForm.Item
-          label='任务周期：'
+          label={`${t('task_scope')}${locale.startsWith('zh-') ? '：' : ':'}`}
           name='timescope'
           rules={rules.timescope}
           validateFirst={true}
@@ -156,28 +163,42 @@ const AddTask = (props: IAddTaskProps) => {
             onChange={onChangeRange}
           />
         </AForm.Item>
-        <AForm.Item label='并行时间：' name='parallelTimes'>
+        <AForm.Item
+          label={`${t('time_parallel')}${
+            locale.startsWith('zh-') ? '：' : ':'
+          }`}
+          name='parallelTimes'
+        >
           <ADatePicker
             multiple
             format='YYYY-MM-DD'
             onChange={onChangeParallelTimes}
           />
         </AForm.Item>
-        <AForm.Item label='任务颜色：' name='color'>
+        <AForm.Item
+          label={`${t('task_color')}${locale.startsWith('zh-') ? '：' : ':'}`}
+          name='color'
+        >
           <AColorPicker allowClear />
         </AForm.Item>
-        <AForm.Item label='任务链接：' name='link'>
-          <AInput placeholder='请输入任务链接, 例如：https://www.baidu.com' />
+        <AForm.Item
+          label={`${t('task_link')}${locale.startsWith('zh-') ? '：' : ':'}`}
+          name='link'
+        >
+          <AInput placeholder={t('task_link_desc')} />
         </AForm.Item>
-        <AForm.Item label='任务描述：' name='desc'>
-          <AInput.TextArea placeholder='请输入任务描述' />
+        <AForm.Item
+          label={`${t('task_desc')}${locale.startsWith('zh-') ? '：' : ':'}`}
+          name='desc'
+        >
+          <AInput.TextArea placeholder={t('task_desc_desc')} />
         </AForm.Item>
         <AForm.Item
           wrapperCol={{ span: 24, offset: 0 }}
           className='flex flex-row justify-end items-center'
         >
           <AButton type='primary' htmlType='submit'>
-            {type === 'add' ? '保存' : '更新'}
+            {type === 'add' ? t('save') : t('update')}
           </AButton>
           {type === 'edit' && (
             <>
@@ -187,7 +208,7 @@ const AddTask = (props: IAddTaskProps) => {
                 onClick={onDeleteTask}
                 className='ml-20px'
               >
-                删除
+                {t('delete')}
               </AButton>
             </>
           )}

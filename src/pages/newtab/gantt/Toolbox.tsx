@@ -9,7 +9,7 @@ type IToolboxProps = {
 const Toolbox = (props: IToolboxProps) => {
   return (
     <div className='absolute top-0 right-[-42px] w-30px h-full flex flex-col items-center'>
-      <ATooltip title='添加任务' placement='right' className='mb-20px'>
+      <ATooltip title={t('add_task')} placement='right' className='mb-20px'>
         <PlusOutlined
           className={clsx(
             'text-20px transition cursor-pointer hover:text-green-500 hover:scale-110',
@@ -21,7 +21,11 @@ const Toolbox = (props: IToolboxProps) => {
           onClick={() => props.setShowType('add')}
         />
       </ATooltip>
-      <ATooltip title='分析统计' placement='right' className='mb-20px'>
+      <ATooltip
+        title={t('analysis_summary')}
+        placement='right'
+        className='mb-20px'
+      >
         <StockOutlined
           className={clsx(
             'text-20px transition cursor-pointer hover:text-yellow-500 hover:scale-110',
@@ -45,7 +49,7 @@ const Toolbox = (props: IToolboxProps) => {
           onClick={() => props.setShowType('refresh')}
         />
       </ATooltip> */}
-      <ATooltip title='重置' placement='right' className='mb-20px'>
+      <ATooltip title={t('reset')} placement='right' className='mb-20px'>
         <DeleteOutlined
           className={clsx(
             'text-20px transition cursor-pointer hover:text-red-500 hover:scale-110',

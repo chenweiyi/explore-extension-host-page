@@ -66,62 +66,64 @@ const Calendar = (props: ICalendarProps) => {
     ganttRef.current?.jumpToTask({ task: t, highlightTask: t })
   }
 
-  function addTask(t: IOriTask) {
-    if (oriTasks.find((o) => o.name === t.name)) {
+  function addTask(task: IOriTask) {
+    if (oriTasks.find((o) => o.name === task.name)) {
       messageApi.open({
         type: 'error',
-        content: '任务名称重复'
+        content: t('task_duplicate_msg')
       })
     } else {
       setOriTasks([
         ...oriTasks,
         {
-          ...t
+          ...task
         }
       ])
       messageApi.open({
         type: 'success',
-        content: '任务创建成功'
+        content: t('task_create_success')
       })
       return true
     }
   }
 
-  function editTask(t: IOriTask) {
+  function editTask(task: IOriTask) {
     if (
-      oriTasks.filter((o) => o.name !== t.name).find((o) => o.name === t.name)
+      oriTasks
+        .filter((o) => o.name !== task.name)
+        .find((o) => o.name === task.name)
     ) {
       messageApi.open({
         type: 'error',
-        content: '任务名称重复'
+        content: t('task_duplicate_msg')
       })
     } else {
-      const task = oriTasks.find((o) => o.name === t.name)
-      const index = oriTasks.findIndex((o) => o.name === t.name)
+      const _task = oriTasks.find((o) => o.name === task.name)
+      const index = oriTasks.findIndex((o) => o.name === task.name)
       if (index > -1) {
         const tasks = [...oriTasks]
         tasks.splice(index, 1, {
-          ...task,
-          ...t
+          ..._task,
+          ...task
         })
         setOriTasks(tasks)
         messageApi.open({
           type: 'success',
-          content: '任务编辑成功'
+          content: t('task_edit_success')
         })
       }
     }
   }
 
-  function deleteTask(t: IOriTask) {
-    const index = oriTasks.findIndex((o) => o.name === t.name)
+  function deleteTask(task: IOriTask) {
+    const index = oriTasks.findIndex((o) => o.name === task.name)
     if (index > -1) {
       const tasks = [...oriTasks]
       tasks.splice(index, 1)
       setOriTasks(tasks)
       messageApi.open({
         type: 'success',
-        content: '任务删除成功'
+        content: t('task_delete_success')
       })
       setShowType('')
       setDrawerOpen(false)
@@ -167,7 +169,7 @@ const Calendar = (props: ICalendarProps) => {
     } else if (showType === 'delete') {
       Modal.confirm({
         icon: <ExclamationCircleOutlined />,
-        content: '确定要删除所有任务吗？',
+        content: t('task_delete_confirm'),
         onOk() {
           setOriTasks([])
           setShowType('')
@@ -178,13 +180,13 @@ const Calendar = (props: ICalendarProps) => {
       })
     } else if (showType === 'analysis') {
       setDrawerOpen(true)
-      setDrawerTitle('分析面板')
+      setDrawerTitle(t('analysis_panel'))
     } else if (showType === 'add') {
       setDrawerOpen(true)
-      setDrawerTitle('添加任务')
+      setDrawerTitle(t('add_task'))
     } else if (showType === 'edit') {
       setDrawerOpen(true)
-      setDrawerTitle(`编辑任务 - ${activeTask?.name}`)
+      setDrawerTitle(`${t('edit_task')} - ${activeTask?.name}`)
     }
   }, [showType])
 

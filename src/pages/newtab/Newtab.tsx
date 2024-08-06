@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { createContext } from 'react'
 import zhCN from 'antd/es/locale/zh_CN'
 import 'dayjs/locale/zh-cn'
 import '@pages/newtab/Newtab.css'
@@ -14,13 +14,22 @@ export enum Features {
   calendar
 }
 
+export interface INewTabContext {
+  locale: string
+}
+
+const NewTabContext = createContext<INewTabContext>({
+  locale: ''
+})
+
 const Newtab = () => {
   const [feature, setFeature] = useState(Features[0])
   const [showToolBar, setShowToolBar] = useState(true)
   // 一句话
   const [showOneWord, setShowOneWord] = useState(true)
 
-  const locale = getLanguage().startsWith('zh-') ? zhCN : null
+  const _locale = getLanguage()
+  const locale = _locale.startsWith('zh-') ? zhCN : null
 
   console.log('locale:', getLanguage())
   const clickTab = () => {
@@ -61,60 +70,63 @@ const Newtab = () => {
 
   return (
     <AConfigProvider locale={locale}>
-      <div className='w-full h-full relative flex justify-center items-center'>
-        {showOneWord ? <OneWord showOneWord={showOneWord} /> : null}
-        <div
-          className='
-          absolute 
-          w-60px 
-          h-200px 
-          left-30px 
-          absolute-y-center 
-          rounded-30px 
-          box-shadow-sample
-          flex
-          flex-col
-          justify-center
-          items-center
-          py-20px
-          transition-all 
-          hover:box-shadow-sample-hover
-        '
-          style={{ display: showToolBar ? 'flex' : 'none' }}
-        >
-          <ATooltip title={t('type_tab')} placement='right'>
-            <IMdiStarBoxOutline
-              className={clsx(
-                'text-24px',
-                'text-blue-300',
-                'cursor-pointer',
-                'hover:text-blue-400',
-                'mb-30px',
-                { 'text-blue-400!': feature === Features[0] }
-              )}
-              onClick={clickTab}
-            />
-          </ATooltip>
-          <ATooltip title={t('type_calendar')} placement='right'>
-            <IMdiClockCheckOutline
-              className={clsx(
-                'text-24px',
-                'text-[#3aa09385]',
-                'cursor-pointer',
-                'hover:text-[#2dccb8]',
-                { 'text-[#2dccb8]!': feature === Features[1] }
-              )}
-              onClick={clickCalendar}
-            />
-          </ATooltip>
+      <NewTabContext.Provider value={{ locale: _locale }}>
+        <div className='w-full h-full relative flex justify-center items-center'>
+          {showOneWord ? <OneWord showOneWord={showOneWord} /> : null}
+          <div
+            className='
+            absolute 
+            w-60px 
+            h-200px 
+            left-30px 
+            absolute-y-center 
+            rounded-30px 
+            box-shadow-sample
+            flex
+            flex-col
+            justify-center
+            items-center
+            py-20px
+            transition-all 
+            hover:box-shadow-sample-hover
+          '
+            style={{ display: showToolBar ? 'flex' : 'none' }}
+          >
+            <ATooltip title={t('type_tab')} placement='right'>
+              <IMdiStarBoxOutline
+                className={clsx(
+                  'text-24px',
+                  'text-blue-300',
+                  'cursor-pointer',
+                  'hover:text-blue-400',
+                  'mb-30px',
+                  { 'text-blue-400!': feature === Features[0] }
+                )}
+                onClick={clickTab}
+              />
+            </ATooltip>
+            <ATooltip title={t('type_calendar')} placement='right'>
+              <IMdiClockCheckOutline
+                className={clsx(
+                  'text-24px',
+                  'text-[#3aa09385]',
+                  'cursor-pointer',
+                  'hover:text-[#2dccb8]',
+                  { 'text-[#2dccb8]!': feature === Features[1] }
+                )}
+                onClick={clickCalendar}
+              />
+            </ATooltip>
+          </div>
+          {feature === Features[0] && <Tab />}
+          {feature === Features[1] && (
+            <Calendar setShowToolBar={setShowToolBar} />
+          )}
         </div>
-        {feature === Features[0] && <Tab />}
-        {feature === Features[1] && (
-          <Calendar setShowToolBar={setShowToolBar} />
-        )}
-      </div>
+      </NewTabContext.Provider>
     </AConfigProvider>
   )
 }
 
 export default withSuspense(Newtab)
+export { NewTabContext }

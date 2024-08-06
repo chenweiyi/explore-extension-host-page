@@ -605,7 +605,7 @@ const Gantt = (props: IGanttProps, ref) => {
             (newXScale(todayEnd) - newXScale(todayStart)) / 2
         )
         .attr('y', 30)
-        .text('今天')
+        .text(t('today'))
         .style('font-size', '10px')
         .attr('writing-mode', 'vertical-lr')
         .attr('letter-spacing', '4')
