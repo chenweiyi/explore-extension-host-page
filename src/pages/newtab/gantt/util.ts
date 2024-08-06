@@ -594,7 +594,7 @@ export function genTasksStatus(
     } else {
       status.add('expired')
     }
-    task.status = Array.from(status) as IStatus
+    task.status = Array.from(status) as IStatus[]
   }
   return target
 }

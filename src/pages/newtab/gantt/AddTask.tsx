@@ -172,19 +172,24 @@ const AddTask = (props: IAddTaskProps) => {
         <AForm.Item label='任务描述：' name='desc'>
           <AInput.TextArea placeholder='请输入任务描述' />
         </AForm.Item>
-        <AForm.Item wrapperCol={{ span: 18, offset: 7 }}>
+        <AForm.Item
+          wrapperCol={{ span: 24, offset: 0 }}
+          className='flex flex-row justify-end items-center'
+        >
           <AButton type='primary' htmlType='submit'>
             {type === 'add' ? '保存' : '更新'}
           </AButton>
           {type === 'edit' && (
-            <AButton
-              type='primary'
-              danger
-              onClick={onDeleteTask}
-              className='ml-20px'
-            >
-              删除
-            </AButton>
+            <>
+              <AButton
+                type='primary'
+                danger
+                onClick={onDeleteTask}
+                className='ml-20px'
+              >
+                删除
+              </AButton>
+            </>
           )}
         </AForm.Item>
       </AForm>

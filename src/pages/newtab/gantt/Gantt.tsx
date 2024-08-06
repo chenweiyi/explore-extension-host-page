@@ -1,7 +1,7 @@
 import * as d3 from 'd3'
 import { getTaskMinMax, getTasksInTimeScope, simpleCopy } from './util'
 
-export type IStatus = Array<
+export type IStatus =
   | 'doing'
   | 'blocking'
   | 'coming-soon'
@@ -10,7 +10,7 @@ export type IStatus = Array<
   | 'expired'
   | 'delay'
   | 'done'
->
+
 export type IChildTaskType = 'start' | 'block' | 'area' | 'end'
 
 export type IChildTask = {
@@ -34,7 +34,7 @@ export type ITask = {
   startTime: string
   endTime: string
   level: number
-  status: IStatus
+  status: IStatus[]
   parallelTimes: string[]
   link?: string
   desc?: string

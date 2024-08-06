@@ -1,5 +1,5 @@
 import withSuspense from '@src/shared/hoc/withSuspense'
-import Gantt, { IChildTask, ITask, ITask2 } from './gantt/Gantt'
+import Gantt, { ITask, ITask2 } from './gantt/Gantt'
 import Toolbox from './gantt/Toolbox'
 import AddTask from './gantt/AddTask'
 import Analysis from './gantt/Analysis'
