@@ -63,7 +63,7 @@ const RightContent = (props: IRightContent) => {
               group
             '
               key={d.id}
-              onClick={() => window.open(d.url)}
+              onClick={() => window.open(d.url, '_blank')}
             >
               <div className='flex items-center'>
                 <span
@@ -71,17 +71,15 @@ const RightContent = (props: IRightContent) => {
                   style={{ backgroundImage: `url(${faviconURL(d.url)})` }}
                 ></span>
                 <a
-                  href={d.url}
                   title={d.title}
-                  target='_blank'
                   rel='noreferrer'
                   className='
                   flex-1
                   text-[16px]
                   group-hover:text-white
                   overflow-hidden
-                text-ellipsis
-                whitespace-nowrap
+                  text-ellipsis
+                  whitespace-nowrap
                 '
                 >
                   {d.title}
