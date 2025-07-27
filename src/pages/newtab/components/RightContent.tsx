@@ -73,17 +73,14 @@ const RightContent = (props: IRightContent) => {
               '
                 title={d.title}
               >
-                <a
-                  href={d.url}
-                  target='_blank'
-                  rel='noreferrer'
+                <span
                   className='
                   text-[16px]
                   group-hover:text-white
                 '
                 >
                   {d.title}
-                </a>
+                </span>
               </div>
 
               <div
