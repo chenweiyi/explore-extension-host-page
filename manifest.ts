@@ -8,9 +8,11 @@ const manifest: chrome.runtime.ManifestV3 = {
   name: packageJson.name,
   version: packageJson.version,
   description: packageJson.description,
-  author: 'chenweiyi',
+  author: {
+    email: 'chenweiyi829@gmail.com'
+  },
   default_locale: 'en',
-  permissions: ['storage', 'bookmarks'],
+  permissions: ['storage', 'bookmarks', 'favicon'],
   options_page: 'src/pages/options/index.html',
   background: {
     service_worker: 'src/pages/background/index.js',
@@ -49,9 +51,12 @@ const manifest: chrome.runtime.ManifestV3 = {
         'star128.png',
         'star48.png',
         'star32.png',
-        'star16.png'
+        'star16.png',
+        'favicon/*'
       ],
-      matches: ['*://*/*']
+      matches: ['*://*/*'],
+      // @ts-ignore
+      extension_ids: ['*']
     }
   ]
 }

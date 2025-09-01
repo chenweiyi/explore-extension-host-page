@@ -18,4 +18,4 @@ utils/reload/injections/*.js
 public/manifest.json
 
 .eslintcache
-
+.output

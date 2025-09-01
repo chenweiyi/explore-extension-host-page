@@ -2,7 +2,7 @@ import React from 'react'
 // import useStorage from '@src/shared/hooks/useStorage'
 // import exampleThemeStorage from '@src/shared/storages/exampleThemeStorage'
 import withSuspense from '@src/shared/hoc/withSuspense'
-import { ICategoryKey, IError, IGithubBookmark } from '../Tab'
+import { faviconURL, ICategoryKey, IError, IGithubBookmark } from '../Tab'
 
 interface IRightContent {
   [str: string]: unknown
@@ -28,7 +28,7 @@ const RightContent = (props: IRightContent) => {
       '
     >
       {props.error ? (
-        <div className='px-[32px] py-[40px] text-[16px]'>
+        <div className='w-full px-[32px] py-[40px] text-[16px] col-span-3'>
           <div className='mb-[12px]'>
             <span>Error:</span>
             <span className='ml-[12px] text-red-500'>{props.error.msg}</span>
@@ -63,20 +63,30 @@ const RightContent = (props: IRightContent) => {
               group
             '
               key={d.id}
-              onClick={() => window.open(d.url)}
+              onClick={() => window.open(d.url, '_blank')}
             >
               <div
                 className='
                 overflow-hidden
                 text-ellipsis
                 whitespace-nowrap
+                flex
+                items-center
               '
                 title={d.title}
               >
                 <span
+                  className='w-16px h-16px mr-8px'
+                  style={{ backgroundImage: `url(${faviconURL(d.url)})` }}
+                ></span>
+                <span
                   className='
+                  flex-1
                   text-[16px]
                   group-hover:text-white
+                  overflow-hidden
+                  text-ellipsis
+                  whitespace-nowrap
                 '
                 >
                   {d.title}

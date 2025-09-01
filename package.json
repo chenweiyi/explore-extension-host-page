@@ -1,6 +1,6 @@
 {
   "name": "explore-extension-host-page",
-  "version": "0.0.3",
+  "version": "0.0.5",
   "description": "chrome extension for host page",
   "license": "MIT",
   "repository": {
@@ -49,7 +49,7 @@
     "@svgr/core": "^8.1.0",
     "@svgr/plugin-jsx": "^8.1.0",
     "@testing-library/react": "13.4.0",
-    "@types/chrome": "0.0.246",
+    "@types/chrome": "0.0.269",
     "@types/d3": "^7.4.3",
     "@types/jest": "^29.5.12",
     "@types/node": "18.15.11",

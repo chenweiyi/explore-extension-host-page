@@ -70,5 +70,125 @@
   },
   "common_placeholder": {
     "message": "敬请期待"
+  },
+  "task_duplicate_msg": {
+    "message": "任务名称重复"
+  },
+  "task_create_success": {
+    "message": "任务创建成功"
+  },
+  "task_edit_success": {
+    "message": "任务编辑成功"
+  },
+  "task_delete_success": {
+    "message": "任务删除成功"
+  },
+  "task_delete_confirm": {
+    "message": "确定要删除所有任务吗？"
+  },
+  "analysis_panel": {
+    "message": "分析面板"
+  },
+  "add_task": {
+    "message": "添加任务"
+  },
+  "edit_task": {
+    "message": "编辑任务"
+  },
+  "input_task_name": {
+    "message": "请输入任务名称"
+  },
+  "task_name_valid_msg": {
+    "message": "任务名称不能包含逗号"
+  },
+  "input_task_timescope": {
+    "message": "请选择任务周期"
+  },
+  "task_timescope_valid_msg": {
+    "message": "开始时间需小于结束时间"
+  },
+  "tip": {
+    "message": "提示"
+  },
+  "task_delete_confirm_content": {
+    "message": "确定要删除任务"
+  },
+  "ma": {
+    "message": "吗？"
+  },
+  "task_name": {
+    "message": "任务名"
+  },
+  "task_scope": {
+    "message": "任务周期"
+  },
+  "time_parallel": {
+    "message": "并行时间"
+  },
+  "task_color": {
+    "message": "任务颜色"
+  },
+  "task_link": {
+    "message": "任务链接"
+  },
+  "task_link_desc": {
+    "message": "请输入任务链接, 例如: $url$",
+    "placeholders": {
+      "url": {
+        "content": "$1",
+        "example": "https://www.baidu.com"
+      }
+    }
+  },
+  "task_desc": {
+    "message": "任务描述"
+  },
+  "task_desc_desc": {
+    "message": "请输入任务描述"
+  },
+  "save": {
+    "message": "保存"
+  },
+  "update": {
+    "message": "更新"
+  },
+  "delete": {
+    "message": "删除"
+  },
+  "no_data": {
+    "message": "暂无数据"
+  },
+  "doing": {
+    "message": "正在进行"
+  },
+  "blocking": {
+    "message": "阻塞中"
+  },
+  "coming_soon": {
+    "message": "即将开始"
+  },
+  "expiring_soon": {
+    "message": "即将过期"
+  },
+  "expired": {
+    "message": "已过期"
+  },
+  "unstart": {
+    "message": "未开始"
+  },
+  "delay": {
+    "message": "延期中"
+  },
+  "done": {
+    "message": "已完成"
+  },
+  "today": {
+    "message": "今天"
+  },
+  "analysis_summary": {
+    "message": "分析统计"
+  },
+  "reset": {
+    "message": "重置"
   }
 }

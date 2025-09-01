@@ -70,5 +70,122 @@
   },
   "common_placeholder": {
     "message": "Stay tuned"
+  },
+  "task_duplicate_msg": {
+    "message": "Task name duplicate"
+  },
+  "task_create_success": {
+    "message": "Task created successfully"
+  },
+  "task_edit_success": {
+    "message": "Task edited successfully"
+  },
+  "task_delete_success": {
+    "message": "Task deleted successfully"
+  },
+  "task_delete_confirm": {
+    "message": "Are you sure you want to delete all tasks?"
+  },
+  "analysis_panel": {
+    "message": "Analysis Panel"
+  },
+  "add_task": {
+    "message": "Add Task"
+  },
+  "edit_task": {
+    "message": "Edit Task"
+  },
+  "input_task_name": {
+    "message": "Please enter the task name"
+  },
+  "task_name_valid_msg": {
+    "message": "The task name cannot contain commas"
+  },
+  "input_task_timescope": {
+    "message": "Please select the task time scope"
+  },
+  "task_timescope_valid_msg": {
+    "message": "The start time must be less than the end time"
+  },
+  "tip": {
+    "message": "Tip"
+  },
+  "task_delete_confirm_content": {
+    "message": "Are you sure you want to delete the task"
+  },
+  "task_name": {
+    "message": "Task Name"
+  },
+  "task_scope": {
+    "message": "Task Scope"
+  },
+  "time_parallel": {
+    "message": "Parallel Time"
+  },
+  "task_color": {
+    "message": "Task Color"
+  },
+  "task_link": {
+    "message": "Task Link"
+  },
+  "task_link_desc": {
+    "message": "Please enter the task link, for example: $url$",
+    "placeholders": {
+      "url": {
+        "content": "$1",
+        "example": "https://www.google.com"
+      }
+    }
+  },
+  "task_desc": {
+    "message": "Task Description"
+  },
+  "task_desc_desc": {
+    "message": "Please enter the task description"
+  },
+  "save": {
+    "message": "Save"
+  },
+  "update": {
+    "message": "Update"
+  },
+  "delete": {
+    "message": "Delete"
+  },
+  "no_data": {
+    "message": "Empty Data"
+  },
+  "doing": {
+    "message": "Doing"
+  },
+  "blocking": {
+    "message": "Blocking"
+  },
+  "coming_soon": {
+    "message": "Coming soon"
+  },
+  "expiring_soon": {
+    "message": "Expiring soon"
+  },
+  "expired": {
+    "message": "Expired"
+  },
+  "unstart": {
+    "message": "Not started"
+  },
+  "delay": {
+    "message": "Delay"
+  },
+  "done": {
+    "message": "Done"
+  },
+  "today": {
+    "message": "Today"
+  },
+  "analysis_summary": {
+    "message": "Analysis Summary"
+  },
+  "reset": {
+    "message": "Reset"
   }
 }
